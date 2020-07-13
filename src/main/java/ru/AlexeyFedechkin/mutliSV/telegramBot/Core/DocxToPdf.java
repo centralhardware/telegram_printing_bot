@@ -27,6 +27,7 @@ public class DocxToPdf {
         PropertyValue[] propertyValues = new PropertyValue[0];
 
         File tempFile = File.createTempFile("docx_to_pdf_converter", ".docx");
+        tempFile.deleteOnExit();
         OutputStream outStream = new FileOutputStream(tempFile);
         byte[] buffer = new byte[8 * 1024];
         int bytesRead;
@@ -50,6 +51,7 @@ public class DocxToPdf {
         propertyValues[1].Value = "writer_pdf_Export";
 
         File result = File.createTempFile("pdf", ".pdf");
+        result.deleteOnExit();
         xStorable.storeToURL(String.format("file:///%s", result.getAbsolutePath()), propertyValues);
 
         return result;

@@ -5,14 +5,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Scope(scopeName = "singleton")
 public class PrintQue {
 
-    private final Map<String, PrintFile> que = new HashMap<>();
+    private final Map<String, PrintFile> que = new ConcurrentHashMap<>();
 
     public void addToQue(@NonNull String id, @NonNull File file, @NonNull String originalFileName){
         que.put(id, new PrintFile(file, originalFileName));

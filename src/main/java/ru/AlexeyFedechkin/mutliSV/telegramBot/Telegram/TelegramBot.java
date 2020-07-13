@@ -199,7 +199,7 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
     public InputStream download(@NotNull List<PhotoSize> photoSizes) throws TelegramApiException {
         PhotoSize photoSize = photoSizes.stream()
                 .max(Comparator.comparing(PhotoSize::getFileSize)).orElse(null);
-        String path = null;
+        String path;
         if (photoSize.hasFilePath()) {
             path = photoSize.getFilePath();
         } else {
