@@ -7,9 +7,8 @@ import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.TelegramUser;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends CrudRepository<TelegramUser, String> {
+public interface UserRepository extends CrudRepository<TelegramUser, Long> {
 
     Optional<TelegramUser> findByToken(String token);
 
-    Optional<TelegramUser> findByUsername(String username);
 }

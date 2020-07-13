@@ -22,12 +22,6 @@ public class InlineKeyboardBuilder {
         return new InlineKeyboardBuilder();
     }
 
-    public static InlineKeyboardBuilder create(@NonNull Long chatId) {
-        InlineKeyboardBuilder builder = new InlineKeyboardBuilder();
-        builder.setChatId(chatId);
-        return builder;
-    }
-
     public InlineKeyboardBuilder setText(@NonNull String text) {
         this.text = text;
         return this;
@@ -48,12 +42,16 @@ public class InlineKeyboardBuilder {
         return this;
     }
 
+    public InlineKeyboardBuilder button(@NonNull String text, @NonNull String callbackData, @NonNull String url) {
+        row.add(new InlineKeyboardButton().setText(text).setCallbackData(callbackData).setUrl(url));
+        return this;
+    }
+
     public InlineKeyboardBuilder endRow() {
         this.keyboard.add(this.row);
         this.row = null;
         return this;
     }
-
 
     public SendMessage build() {
         SendMessage message = new SendMessage();

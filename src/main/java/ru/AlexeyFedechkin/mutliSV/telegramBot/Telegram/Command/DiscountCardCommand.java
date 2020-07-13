@@ -1,7 +1,8 @@
 package ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.Command;
 
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
@@ -12,18 +13,19 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.QR;
-import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.TelegramCache;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Service.UserService;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.SpringContext;
-import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.TokenNotFoundException;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.Mapper;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.TelegramCache;
 
 import java.util.Comparator;
 
 /**
  * get QR code with unique user token
  */
-@Slf4j
 public class DiscountCardCommand extends BotCommand {
+
+    private static final Logger log = LoggerFactory.getLogger(DiscountCardCommand.class);
 
     public DiscountCardCommand() {
         super("discount_card", "get discount qr");
@@ -37,6 +39,7 @@ public class DiscountCardCommand extends BotCommand {
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
         log.info(String.format("execute command %s for user %s", DiscountCardCommand.class.toString(), user.getUserName()));
+        service.create(Mapper.toInnerUser(user));
         try {
             SendChatAction sendChatAction = new SendChatAction().setChatId(chat.getId()).setAction(ActionType.UPLOADPHOTO);
             absSender.execute(sendChatAction);
@@ -50,19 +53,19 @@ public class DiscountCardCommand extends BotCommand {
                 sendAndStoreCache(sendPhoto,user,absSender);
             }
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            log.warn("unable to send message", e);
         }
     }
 
     private void sendAndStoreCache(@NonNull SendPhoto sendPhoto, @NonNull User user, @NonNull AbsSender absSender){
         try {
-            sendPhoto.setPhoto(String.format("QR for %s", user.getUserName()), QR.generateQRCodeImage(service.getToken(user.getUserName())));
+            sendPhoto.setPhoto(String.format("QR for %s", user.getUserName()), QR.generateQRCodeImage(service.getToken(Long.valueOf(user.getId()))));
             var message = absSender.execute(sendPhoto);
             String fileId = message.getPhoto().stream().max(Comparator.comparing(PhotoSize::getFileSize))
                     .orElse(null).getFileId();
             telegramCache.store(user.getId(), fileId);
-        } catch (TokenNotFoundException | TelegramApiException e) {
-            e.printStackTrace();
+        } catch (TelegramApiException e) {
+            log.warn("unable to send message with cache", e);
         }
     }
 }

@@ -1,0 +1,37 @@
+version: '3'
+services:
+  bot:
+    container_name: multiSVBot
+    build: .
+    depends_on:
+      - "db"
+    ports:
+      - 8080:8080
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_SHOW_SQL: "false"
+
+      USERNAME: 'telegram bot username'
+      TOKEN: "telegram token"
+      CUPS_HOST: localhost
+      CUPS_PORT: 631
+      PAGE_PRICE: 2
+      SBERBANK_USERNAME: ''
+      SBERBANK_PASSWORD: ''
+      BASE_URL: ""
+      IS_ENBALE_QR: "false"
+      COMPANY_NAME: ''
+      COMPANY_LOCATION: ""
+      EMBEDDED_MAP: 'ifrme with map or some other content'
+      COMPANY_WORKING_TIME: "пн-пт 10-22"
+      IS_ENABLE_VK: "false"
+      VK_GROUP_ID: ""
+      VK_GROUP_TOKEN: ""
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
