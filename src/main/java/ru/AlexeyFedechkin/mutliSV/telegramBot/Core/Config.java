@@ -2,13 +2,17 @@ package ru.AlexeyFedechkin.mutliSV.telegramBot.Core;
 
 import lombok.Getter;
 
+import java.util.ResourceBundle;
+
 public class Config {
+
+    private static final ResourceBundle resource = ResourceBundle.getBundle("config");
     @Getter
-    private static final String username    = "mutliSVTestBot";
+    private static final String username    = resource.getString("username");
     @Getter
-    private static final String token       = "985543338:AAF0sBsWLRQiPYpdItyU5iEEfU9AU2KxQzE";
+    private static final String token       = resource.getString("token");
     @Getter
-    private static final String cupsHost   = "127.0.0.1";
+    private static final String cupsHost    = resource.getString("cupsHost");
     @Getter
-    private static final int    cupsPort   = 631;
+    private static final int    cupsPort    = Integer.parseInt(resource.getString("cupsPort"));
 }

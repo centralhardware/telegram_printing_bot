@@ -1,0 +1,12 @@
+version: '3'
+services:
+  bot:
+    container_name: multiSVBot
+    build: .
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
