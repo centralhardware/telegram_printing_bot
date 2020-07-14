@@ -15,4 +15,6 @@ public class Config {
     private static final String cupsHost    = resource.getString("cupsHost");
     @Getter
     private static final int    cupsPort    = Integer.parseInt(resource.getString("cupsPort"));
+    @Getter
+    private static final int    pagePrice   = Integer.parseInt(resource.getString("pagePrice"));
 }

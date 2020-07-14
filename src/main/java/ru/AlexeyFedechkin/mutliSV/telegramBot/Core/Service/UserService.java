@@ -44,7 +44,7 @@ public class UserService {
      * @return
      * @throws TokenNotFoundException requested user not exist
      */
-    public String getToken(@NonNull String username) throws TokenNotFoundException {
+    public String getToken(@NonNull String username) {
         var optionalUser = userRepository.findById(username);
         if (optionalUser.isPresent()){
             var user = optionalUser.get();
@@ -59,7 +59,7 @@ public class UserService {
                 return user.getToken();
             }
         }
-        throw new TokenNotFoundException();
+        return null;
     }
 
     public Optional<TelegramUser> getUserByToken(@NonNull String token){

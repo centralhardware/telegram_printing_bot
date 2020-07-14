@@ -1,6 +1,8 @@
 package ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram;
 
 import com.google.zxing.NotFoundException;
+import com.google.zxing.pdf417.PDF417Reader;
+import com.itextpdf.text.pdf.PdfReader;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.uno.Exception;
 import lombok.NonNull;
@@ -12,10 +14,12 @@ import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
+import org.telegram.telegrambots.meta.api.methods.send.SendInvoice;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.meta.api.objects.*;
+import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.*;
@@ -27,6 +31,7 @@ import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.Command.StartCommand;
 
 import javax.validation.constraints.NotNull;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -83,6 +88,9 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
             SendChatAction sendChatAction = new SendChatAction().setChatId(chatID).setAction(ActionType.UPLOADDOCUMENT);
             execute(sendChatAction);
             if (document.getMimeType().equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")){
+                if (printQue.isFileInQue(service.getToken(username))) {
+
+                }
                 try {
                     java.io.File result = null;
                     try {
@@ -93,12 +101,17 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                     SendDocument sendDocument = new SendDocument().
                             setChatId(chatID).
                             setDocument(String.format("%s.pdf", document.getFileName()), new FileInputStream(result));
-                    String printJobIdentifier = Random.getAlphaNumericString();
+                    String printJobIdentifier = service.getToken(username);
+                    PdfReader pdfReader = new PdfReader(result.getAbsolutePath());
+                    int price = pdfReader.getNumberOfPages() * Config.getPagePrice();
                     var message = InlineKeyboardBuilder.
                             create(chatID).
-                            setText("Отправить на печать").
-                            row().button("да", printJobIdentifier).endRow();
-                    printQue.addToQue(printJobIdentifier, result, document.getFileName());
+                            setText(String.format("Поверьте документ на предмет ошибок. '\n " +
+                                    "Стоимость заказа: %s \n  " +
+                                    "Оплатить", price)).
+                            row().button("да", printJobIdentifier).endRow().
+                            row().button("нет", "нет").endRow();
+                    printQue.addToQue(printJobIdentifier, result, document.getFileName(), price);
                     execute(sendDocument);
                     execute(message.build());
                 } catch (IOException e) {
@@ -128,16 +141,35 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
         try {
             SendChatAction sendChatAction = new SendChatAction().setChatId(callbackQuery.getMessage().getChatId()).setAction(ActionType.TYPING);
             execute(sendChatAction);
+            if (callbackQuery.getData().equals("нет")){
+                DeleteMessage deleteMessage = new DeleteMessage().
+                        setChatId(callbackQuery.getMessage().getChatId()).
+                        setMessageId(callbackQuery.getMessage().getMessageId());
+                execute(deleteMessage);
+                SendMessage sendMessage = new SendMessage().setText("Покупка отменена").setChatId(callbackQuery.getMessage().getChatId());
+                execute(sendMessage);
+                printQue.removeFromQue(service.getToken(callbackQuery.getFrom().getUserName()));
+                return;
+            }
             if (printQue.isFileInQue(callbackQuery.getData())){
                 var printId = callbackQuery.getData();
                 DeleteMessage deleteMessage = new DeleteMessage().
                         setChatId(callbackQuery.getMessage().getChatId()).
                         setMessageId(callbackQuery.getMessage().getMessageId());
                 execute(deleteMessage);
-                SendMessage sendMessage = new SendMessage().setChatId(callbackQuery.getMessage().getChatId()).setText("Печатаем ваш файл");
-                execute(sendMessage);
-                cups.print(printQue.getFile(printId), callbackQuery.getMessage().getFrom().getUserName(), printQue.getOriginalFileName(printId));
-                printQue.removeFromQue(printId);
+                LabeledPrice labeledPrice = new LabeledPrice();
+                labeledPrice.setLabel("Печать");
+                labeledPrice.setAmount(printQue.getPrice(printId));
+                List<LabeledPrice> labeledPrices = new ArrayList<>();
+                labeledPrices.add(labeledPrice);
+                SendInvoice sendInvoice = new SendInvoice().
+                        setChatId(Math.toIntExact(callbackQuery.getMessage().getChatId())).
+                        setCurrency("RUB").
+                        setDescription("Оплата печати").
+                        setTitle("Печать").
+                        setPayload(printId).setProviderToken("401643678:TEST:967cd689-8034-43ba-8876-acc2be3e9548").
+                        setStartParameter(printId).setPrices(labeledPrices);
+                execute(sendInvoice);
                 return;
             }
             var userService = SpringContext.getBean(UserService.class);

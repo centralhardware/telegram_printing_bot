@@ -61,7 +61,7 @@ public class DiscountCardCommand extends BotCommand {
             String fileId = message.getPhoto().stream().max(Comparator.comparing(PhotoSize::getFileSize))
                     .orElse(null).getFileId();
             telegramCache.store(user.getId(), fileId);
-        } catch (TokenNotFoundException | TelegramApiException e) {
+        } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }
