@@ -3,6 +3,11 @@ services:
   bot:
     container_name: multiSVBot
     build: .
+    depends_on:
+    - "db"
+    volumes:
+      - ./application.properties:=/config/application.properties
+    command: --spring.config.location=/config/application.properties
 
   db:
     image: postgres

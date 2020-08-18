@@ -48,6 +48,11 @@ public class InlineKeyboardBuilder {
         return this;
     }
 
+    public InlineKeyboardBuilder button(@NonNull String text, @NonNull String callbackData, @NonNull String url) {
+        row.add(new InlineKeyboardButton().setText(text).setCallbackData(callbackData).setUrl(url));
+        return this;
+    }
+
     public InlineKeyboardBuilder endRow() {
         this.keyboard.add(this.row);
         this.row = null;

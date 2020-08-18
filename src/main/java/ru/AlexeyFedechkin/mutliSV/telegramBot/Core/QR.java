@@ -4,8 +4,10 @@ import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import net.glxn.qrgen.javase.QRCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -14,8 +16,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-@Slf4j
 public class QR {
+
+    private static final Logger log = LoggerFactory.getLogger(Cups.class);
 
     public static InputStream generateQRCodeImage(@NonNull String barcodeText) {
         log.info(String.format("generate QR code from String: %s", barcodeText));

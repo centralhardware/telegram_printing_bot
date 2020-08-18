@@ -2,8 +2,11 @@ package ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Service;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.TelegramUser;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Random;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Repository.UserRepository;
@@ -12,14 +15,15 @@ import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.TokenNotFoundException;
 import java.util.Optional;
 
 @Component
-@Slf4j
 public class UserService {
+
+    private static final Logger log = LoggerFactory.getLogger(Cups.class);
 
     @Autowired
     private UserRepository userRepository;
 
     public void create(@NonNull TelegramUser user){
-        if (!checkExistence(user.getUsername())){
+        if (!checkExistence(user.getId())){
             userRepository.save(user);
             log.info(String.format("create user: %s", user.getUsername()));
         }
@@ -31,31 +35,31 @@ public class UserService {
     }
 
     /**
-     * @param username
+     * @param id
      * @return true if user exist
      */
-    private boolean checkExistence(@NonNull String username){
-        return userRepository.existsById(username);
+    private boolean checkExistence(@NonNull Long id){
+        return userRepository.existsById(id);
     }
 
     /**
      * get or generate token by user username
-     * @param username
+     * @param id
      * @return
      * @throws TokenNotFoundException requested user not exist
      */
-    public String getToken(@NonNull String username) {
-        var optionalUser = userRepository.findById(username);
+    public String getToken(@NonNull Long id) {
+        var optionalUser = userRepository.findById(id);
         if (optionalUser.isPresent()){
             var user = optionalUser.get();
             if (user.getToken() == null){
                 var token = Random.getAlphaNumericString();
                 user.setToken(token);
                 userRepository.save(user);
-                log.info(String.format("generate token - %s for user %s", token, username));
+                log.info(String.format("generate token - %s for user %s", token, id));
                 return token;
             } else {
-                log.info(String.format("get token for user %s from database", username));
+                log.info(String.format("get token for user %s from database", id));
                 return user.getToken();
             }
         }
@@ -66,8 +70,8 @@ public class UserService {
         return userRepository.findByToken(token);
     }
 
-    public Optional<TelegramUser> getUserByUsername(@NonNull String username) {
-        return userRepository.findByUsername(username);
+    public Optional<TelegramUser> getUserById(@NonNull Long id) {
+        return userRepository.findById(id);
     }
 
 }

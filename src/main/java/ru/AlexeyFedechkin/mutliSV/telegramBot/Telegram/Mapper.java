@@ -7,7 +7,7 @@ import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.TelegramUser;
 public class Mapper {
 
     public static TelegramUser toInnerUser(@NonNull User user){
-        return TelegramUser.builder().firstName(user.getFirstName()).secondName(user.getLastName()).username(user.getUserName()).build();
+        return TelegramUser.builder().id(Long.valueOf(user.getId())).firstName(user.getFirstName()).secondName(user.getLastName()).username(user.getUserName()).build();
     }
 
 }

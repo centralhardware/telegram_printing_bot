@@ -1,12 +1,12 @@
 package ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram;
 
 import com.google.zxing.NotFoundException;
-import com.google.zxing.pdf417.PDF417Reader;
 import com.itextpdf.text.pdf.PdfReader;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.uno.Exception;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -14,29 +14,35 @@ import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
-import org.telegram.telegrambots.meta.api.methods.send.SendInvoice;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.meta.api.objects.*;
-import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
-import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.*;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Config;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.PrintDetail;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.PrintQue;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.DocxToPdf;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.Payment;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.QR;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Sberbank.PaymentDetail;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Sberbank.Sberbank;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Service.PaymentService;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Service.UserService;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.SpringContext;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.Command.DiscountCardCommand;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.Command.StartCommand;
 
 import javax.validation.constraints.NotNull;
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-@Slf4j
 public class TelegramBot extends TelegramLongPollingCommandBot {
+
+    private static final Logger log = LoggerFactory.getLogger(Cups.class);
 
     static {
         ApiContextInitializer.init();
@@ -56,13 +62,17 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
     public TelegramBot(){
         register(new StartCommand());
         log.info(String.format("register command %s", StartCommand.class.toString()));
-        register(new DiscountCardCommand());
+        if (Config.isIsEnableQr()){
+            register(new DiscountCardCommand());
+        }
         log.info(String.format("register command %s", DiscountCardCommand.class.toString()));
         service = SpringContext.getBean(UserService.class);
         printQue = SpringContext.getBean(PrintQue.class);
         cups = SpringContext.getBean(Cups.class);
+        paymentService = SpringContext.getBean(PaymentService.class);
     }
 
+    private final PaymentService paymentService;
     private final UserService service;
     private final PrintQue printQue;
     private final Cups cups;
@@ -71,7 +81,7 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
     public void processNonCommandUpdate(Update update) {
         if (update.hasMessage()){
             var message = update.getMessage();
-            if (message.hasPhoto()){
+            if (message.hasPhoto() && Config.isIsEnableQr()){
                 processIncomingQR(update);
             } else if (message.hasDocument()){
                 processDocument(message.getDocument(), update.getMessage().getChatId(), update.getMessage().getFrom().getUserName());
@@ -88,9 +98,6 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
             SendChatAction sendChatAction = new SendChatAction().setChatId(chatID).setAction(ActionType.UPLOADDOCUMENT);
             execute(sendChatAction);
             if (document.getMimeType().equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")){
-                if (printQue.isFileInQue(service.getToken(username))) {
-
-                }
                 try {
                     java.io.File result = null;
                     try {
@@ -101,7 +108,7 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                     SendDocument sendDocument = new SendDocument().
                             setChatId(chatID).
                             setDocument(String.format("%s.pdf", document.getFileName()), new FileInputStream(result));
-                    String printJobIdentifier = service.getToken(username);
+                    String printJobIdentifier = service.getToken(chatID);
                     PdfReader pdfReader = new PdfReader(result.getAbsolutePath());
                     int price = pdfReader.getNumberOfPages() * Config.getPagePrice();
                     var message = InlineKeyboardBuilder.
@@ -111,15 +118,15 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                                     "Оплатить", price)).
                             row().button("да", printJobIdentifier).endRow().
                             row().button("нет", "нет").endRow();
-                    printQue.addToQue(printJobIdentifier, result, document.getFileName(), price);
+                    printQue.addToQue(printJobIdentifier ,new PrintDetail(result, document.getFileName(), price));
                     execute(sendDocument);
                     execute(message.build());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             } else if (document.getMimeType().equals("application/pdf")){
-                SendMessage sendMessage = new SendMessage().setChatId(chatID).setText("Отправлено на печать");
-                execute(sendMessage);
+                sendChatAction = new SendChatAction().setChatId(chatID).setAction(ActionType.TYPING);
+                execute(sendChatAction);
                 InputStream inputStream = download(document.getFileId());
                 java.io.File targetFile = java.io.File.createTempFile("download_pdf", ".pdf");
                 OutputStream outStream = new FileOutputStream(targetFile);
@@ -129,7 +136,19 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
                     outStream.write(buffer, 0, bytesRead);
                 }
-                cups.print(targetFile, username, document.getFileName());
+                PdfReader pdfReader = new PdfReader(targetFile.getAbsolutePath());
+                int price = pdfReader.getNumberOfPages() * Config.getPagePrice();
+                printQue.addToQue(String.valueOf(chatID) ,new PrintDetail(targetFile, document.getFileName(), price));
+                Payment payment = paymentService.createPayment(service.getUserById(chatID).get() , price);
+                PaymentDetail paymentDetail = Sberbank.requestPaymentDetail(payment);
+                payment.setOrderId(paymentDetail.getOrderId());
+                paymentService.save(payment);
+                InlineKeyboardBuilder inlineKeyboardBuilder = InlineKeyboardBuilder.create().
+                        setText(String.format("Стоимость заказа: %s", price)).
+                        setChatId(chatID).
+                        row().button("Оплатить", "sdf", paymentDetail.getFormUrl()).endRow();
+                execute(inlineKeyboardBuilder.build());
+                return;
             }
         } catch (java.lang.Exception e) {
             e.printStackTrace();
@@ -148,7 +167,7 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                 execute(deleteMessage);
                 SendMessage sendMessage = new SendMessage().setText("Покупка отменена").setChatId(callbackQuery.getMessage().getChatId());
                 execute(sendMessage);
-                printQue.removeFromQue(service.getToken(callbackQuery.getFrom().getUserName()));
+                printQue.removeFromQue(service.getToken(Long.valueOf(callbackQuery.getFrom().getId())));
                 return;
             }
             if (printQue.isFileInQue(callbackQuery.getData())){
@@ -157,19 +176,15 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                         setChatId(callbackQuery.getMessage().getChatId()).
                         setMessageId(callbackQuery.getMessage().getMessageId());
                 execute(deleteMessage);
-                LabeledPrice labeledPrice = new LabeledPrice();
-                labeledPrice.setLabel("Печать");
-                labeledPrice.setAmount(printQue.getPrice(printId));
-                List<LabeledPrice> labeledPrices = new ArrayList<>();
-                labeledPrices.add(labeledPrice);
-                SendInvoice sendInvoice = new SendInvoice().
-                        setChatId(Math.toIntExact(callbackQuery.getMessage().getChatId())).
-                        setCurrency("RUB").
-                        setDescription("Оплата печати").
-                        setTitle("Печать").
-                        setPayload(printId).setProviderToken("401643678:TEST:967cd689-8034-43ba-8876-acc2be3e9548").
-                        setStartParameter(printId).setPrices(labeledPrices);
-                execute(sendInvoice);
+                Payment payment = paymentService.createPayment(service.getUserById(Long.valueOf(callbackQuery.getFrom().getId())).get() , printQue.getPrintDetail(printId).getPrice());
+                PaymentDetail paymentDetail = Sberbank.requestPaymentDetail(payment);
+                payment.setOrderId(paymentDetail.getOrderId());
+                paymentService.save(payment);
+                InlineKeyboardBuilder inlineKeyboardBuilder = InlineKeyboardBuilder.create().
+                        setText("?").
+                        setChatId(Long.valueOf(callbackQuery.getFrom().getId())).
+                        row().button("Оплатить", "sdf", paymentDetail.getFormUrl()).endRow();
+                execute(inlineKeyboardBuilder.build());
                 return;
             }
             var userService = SpringContext.getBean(UserService.class);
@@ -240,6 +255,10 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
         return downloadFileAsStream(path);
     }
 
+    public InputStream download(String fileID) throws TelegramApiException {
+        return downloadFileAsStream(getFilePath(fileID));
+    }
+
     public String getFilePath(String fileID){
         GetFile getFileMethod = new GetFile();
         getFileMethod.setFileId(fileID);
@@ -250,10 +269,6 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
             log.warn("", e);
         }
         return null;
-    }
-
-    public InputStream download(String fileID) throws TelegramApiException {
-        return downloadFileAsStream(getFilePath(fileID));
     }
 
     public String getBotUsername() {

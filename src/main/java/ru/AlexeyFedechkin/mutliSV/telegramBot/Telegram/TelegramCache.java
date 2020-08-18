@@ -1,17 +1,20 @@
 package ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram;
 
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component()
 @Scope(scopeName = "singleton")
-@Slf4j
 public class TelegramCache {
+
+    private static final Logger log = LoggerFactory.getLogger(Cups.class);
 
     private final Map<Integer, String> cache = new ConcurrentHashMap<>();
 
