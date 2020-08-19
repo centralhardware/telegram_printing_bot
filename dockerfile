@@ -15,7 +15,7 @@ FROM openjdk:14-alpine
 
 
 COPY --from=maven target/multiSVBot-1.0-SNAPSHOT.jar .
-COPY --from=maven target/lib .
+COPY --from=maven target/lib /lib
 
 RUN set -xe \
     && apk add --no-cache --purge -uU \
@@ -33,4 +33,4 @@ RUN set -xe \
     && rm -rf /var/cache/apk/* /tmp/*
 
 
-ENTRYPOINT ["java", "-jar", "multiSVBot-1.0-SNAPSHOT.jar", "--classpath=lib," "-Dspring.config.location=/config/application.properties" ]
+CMD ["java", "-jar", "multiSVBot-1.0-SNAPSHOT.jar", "--classpath=/lib" ]
