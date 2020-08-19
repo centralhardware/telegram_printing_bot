@@ -1,6 +1,5 @@
 package ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.Command;
 
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
@@ -27,7 +26,8 @@ public class StartCommand extends BotCommand {
 
     //TODO add format
     private static final String HELLO_MESSAGE = "Привет %s Добро пожаловать в бот " + Config.getCompanyName() +   "\n" +
-            " просто отправте боту файл в формате docx или pdf и можете забрать готовую распечатку в "+ Config.getCompanyLocation() + "\n";
+            " просто отправте боту файл в формате docx или pdf и можете забрать готовую распечатку в "+ Config.getCompanyLocation() + "\n" +
+            "Мы работаем: " + Config.getWorkingTime();
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments){

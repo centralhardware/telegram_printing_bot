@@ -13,12 +13,13 @@ public class Config {
     private static final String sberbankUserName    = resource.getString("sberbankUserName");
     private static final String sberbankPassword    = resource.getString("sberbankPassword");
     private static final String baseUrl             = resource.getString("baseUrl");
-    private static final String sberbankFailUrl     = baseUrl + "/payment/fail";
-    private static final String sberbankSuccessUrl  = baseUrl + "/payment/success";
+    private static final String sberbankFailUrl     = baseUrl + "/fail";
+    private static final String sberbankSuccessUrl  = baseUrl + "/success";
     private static final boolean isEnableQr         = Boolean.parseBoolean(resource.getString("isEnableQr"));
     private static final String companyName         = resource.getString("companyName");
     private static final String companyLocation     = resource.getString("companyLocation");
     private static final String embededMapIfram     = resource.getString("embeddedMap");
+    private static final String workingTime         = resource.getString("workingTime");
 
     public static ResourceBundle getResource() {
         return resource;
@@ -78,5 +79,9 @@ public class Config {
 
     public static String getEmbeddedMapIframe() {
         return embededMapIfram;
+    }
+
+    public static String getWorkingTime() {
+        return workingTime;
     }
 }

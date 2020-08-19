@@ -64,8 +64,8 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
         log.info(String.format("register command %s", StartCommand.class.toString()));
         if (Config.isIsEnableQr()){
             register(new DiscountCardCommand());
+            log.info(String.format("register command %s", DiscountCardCommand.class.toString()));
         }
-        log.info(String.format("register command %s", DiscountCardCommand.class.toString()));
         service = SpringContext.getBean(UserService.class);
         printQue = SpringContext.getBean(PrintQue.class);
         cups = SpringContext.getBean(Cups.class);
@@ -108,7 +108,7 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                     SendDocument sendDocument = new SendDocument().
                             setChatId(chatID).
                             setDocument(String.format("%s.pdf", document.getFileName()), new FileInputStream(result));
-                    String printJobIdentifier = service.getToken(chatID);
+                    String printJobIdentifier = String.valueOf(chatID);
                     PdfReader pdfReader = new PdfReader(result.getAbsolutePath());
                     int price = pdfReader.getNumberOfPages() * Config.getPagePrice();
                     var message = InlineKeyboardBuilder.
@@ -143,12 +143,16 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                 PaymentDetail paymentDetail = Sberbank.requestPaymentDetail(payment);
                 payment.setOrderId(paymentDetail.getOrderId());
                 paymentService.save(payment);
+                if (!cups.checkAlive()){
+                    SendMessage sendMessage = new SendMessage().setChatId(chatID).setText("Приносим свои извенения, но мы не можем выполнить печать в данный момент");
+                    execute(sendMessage);
+                    return;
+                }
                 InlineKeyboardBuilder inlineKeyboardBuilder = InlineKeyboardBuilder.create().
                         setText(String.format("Стоимость заказа: %s", price)).
                         setChatId(chatID).
                         row().button("Оплатить", "sdf", paymentDetail.getFormUrl()).endRow();
                 execute(inlineKeyboardBuilder.build());
-                return;
             }
         } catch (java.lang.Exception e) {
             e.printStackTrace();
@@ -180,6 +184,11 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                 PaymentDetail paymentDetail = Sberbank.requestPaymentDetail(payment);
                 payment.setOrderId(paymentDetail.getOrderId());
                 paymentService.save(payment);
+                if (!cups.checkAlive()){
+                    SendMessage sendMessage = new SendMessage().setChatId(String.valueOf(callbackQuery.getFrom().getId())).setText("Приносим свои извенения, но мы не можем выполнить печать в данный момент");
+                    execute(sendMessage);
+                    return;
+                }
                 InlineKeyboardBuilder inlineKeyboardBuilder = InlineKeyboardBuilder.create().
                         setText("?").
                         setChatId(Long.valueOf(callbackQuery.getFrom().getId())).

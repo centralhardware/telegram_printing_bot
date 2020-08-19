@@ -44,8 +44,9 @@ public class Random {
      * @throws IllegalArgumentException if {@code count} &lt; 0 or the provided chars array is empty.
      * @since 2.0
      */
+    @SuppressWarnings("SameParameterValue")
     private static String random(int count, int start, int end, final boolean letters, final boolean numbers,
-                                final char[] chars, final java.util.Random random) {
+                                 final char[] chars, final java.util.Random random) {
 
         if (chars != null && chars.length == 0) {
             throw new IllegalArgumentException("The chars array must not be empty");

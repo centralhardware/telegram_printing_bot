@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Config;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.PrintDetail;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.PrintQue;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.Payment;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Service.PaymentService;
@@ -16,7 +17,7 @@ import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Service.PaymentService;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("payment/")
+@RequestMapping()
 public class PaymentWeb {
 
     private static final Logger log = LoggerFactory.getLogger(Cups.class);
@@ -57,6 +58,15 @@ public class PaymentWeb {
             Payment payment = paymentOptional.get();
             payment.setIsSuccessfully(true);
             paymentService.save(payment);
+            PrintDetail printDetail = printQue.getPrintDetail(String.valueOf(payment.getCreatedBy().getId()));
+            try {
+                cups.print(printDetail.getFile(), payment.getCreatedBy().getUsername(), printDetail.getOriginalFileName());
+            } catch (Exception e) {
+                return ResponseEntity.ok("<center> <H1>Оплата прошла успешно. Однако печать не удалась</H1> " +
+                        "<H3>Приносим свои извенения. Во время отправки на печать произвошла ошибка</H3>" +
+                        "</center>" +
+                        "<center>" + Config.getEmbeddedMapIframe() + "</center>");
+            }
             return ResponseEntity.ok("<center> <H1>Оплата прошла успешно</H1> " +
                     "<H3>Благодарим за покупку в " + Config.getCompanyName() + "</H3>" +
                     "<H3>Документ уже отправлен на печать. Вы можете забрать его по адресу: "+ Config.getCompanyLocation() + "</H3>" +

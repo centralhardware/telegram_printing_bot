@@ -2,8 +2,8 @@ package ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Sberbank;
 
 public class PaymentDetail {
 
-    private String orderId;
-    private String formUrl;
+    private final String orderId;
+    private final String formUrl;
 
     public PaymentDetail(String orderId, String formUrl) {
         this.orderId = orderId;

@@ -1,7 +1,6 @@
 package ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity;
 
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;

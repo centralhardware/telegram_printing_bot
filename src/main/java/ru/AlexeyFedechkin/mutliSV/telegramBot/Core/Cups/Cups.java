@@ -24,6 +24,9 @@ public class Cups {
     private static final Logger log = LoggerFactory.getLogger(Cups.class);
     private CupsPrinter cupsPrinter;
 
+    /**
+     * create instance of cupsPrinter
+     */
     @PostConstruct
     public void init(){
         try {
@@ -38,20 +41,35 @@ public class Cups {
         }
     }
 
+    /**
+     * print document via cups server
+     * @param file file to print
+     * @param username user that send document to print
+     * @param fileName original file name
+     * @return
+     * @throws Exception
+     */
     public boolean print(@NonNull File file, @NonNull String username, @NonNull String fileName) throws Exception {
         byte[] bytes = Files.readAllBytes(file.toPath());
-        PrintJob printJob = new PrintJob.Builder(bytes).build();
+        PrintJob printJob = new PrintJob.Builder(bytes).jobName(String.format("for user %s file %s", username, fileName)).build();
         var printRequestResult = cupsPrinter.print(printJob);
         return printRequestResult.isSuccessfulResult();
     }
 
+    /**
+     * check cups host availability
+     * @return true if cups host is up
+     */
     public boolean checkAlive(){
         try {
-            URL url = new URL(String.format("%s:%o", Config.getCupsHost(), Config.getCupsPort()));
+            URL url = new URL(String.format("http://%s:" + Config.getCupsPort(), Config.getCupsHost()));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.connect();
             if (connection.getResponseCode() == 200) return true;
-        } catch (IOException ignored) { }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
         return false;
     }
 

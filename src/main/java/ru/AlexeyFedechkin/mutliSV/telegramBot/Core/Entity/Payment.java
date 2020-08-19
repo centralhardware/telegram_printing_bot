@@ -1,7 +1,6 @@
 package ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity;
 
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
@@ -26,19 +25,19 @@ public class Payment {
             strategy = "org.hibernate.id.UUIDGenerator"
     )
     @Column(updatable = false, nullable = false)
-    private String uuid;
+    private final String uuid;
     private String orderId;
     @Column(nullable = false)
-    private Integer amount;
+    private final Integer amount;
     @Column
     private Boolean isSuccessfully;
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_date")
-    private Date createDate;
+    private final Date createDate;
     @ManyToOne
     @JoinColumn(name = "createdBy_id",nullable = false)
-    private TelegramUser createdBy;
+    private final TelegramUser createdBy;
 
     public void setIsSuccessfully(boolean isSuccessfully){
         log.info(String.format("set if success to %s for transaction %s",isSuccessfully, uuid ));
