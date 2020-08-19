@@ -25,19 +25,19 @@ public class Payment {
             strategy = "org.hibernate.id.UUIDGenerator"
     )
     @Column(updatable = false, nullable = false)
-    private final String uuid;
+    private String uuid;
     private String orderId;
     @Column(nullable = false)
-    private final Integer amount;
+    private Integer amount;
     @Column
     private Boolean isSuccessfully;
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_date")
-    private final Date createDate;
+    private Date createDate;
     @ManyToOne
     @JoinColumn(name = "createdBy_id",nullable = false)
-    private final TelegramUser createdBy;
+    private  TelegramUser createdBy;
 
     public void setIsSuccessfully(boolean isSuccessfully){
         log.info(String.format("set if success to %s for transaction %s",isSuccessfully, uuid ));
