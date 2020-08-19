@@ -6,8 +6,7 @@ services:
     depends_on:
     - "db"
     volumes:
-      - ./application.properties:=/config/application.properties
-    command: --spring.config.location=/config/application.properties
+      - ./conf:/config
 
   db:
     image: postgres

@@ -33,4 +33,4 @@ RUN set -xe \
     && rm -rf /var/cache/apk/* /tmp/*
 
 
-CMD ["java", "-jar", "multiSVBot-1.0-SNAPSHOT.jar", "--classpath=lib" ]
+ENTRYPOINT ["java", "-jar", "multiSVBot-1.0-SNAPSHOT.jar", "--classpath=lib," "-Dspring.config.location=/config/application.properties" ]
