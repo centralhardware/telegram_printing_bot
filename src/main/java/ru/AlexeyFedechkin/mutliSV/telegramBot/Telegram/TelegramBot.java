@@ -116,7 +116,7 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                         PdfReader pdfReader = new PdfReader(result.getAbsolutePath());
                         int pageCount = pdfReader.getNumberOfPages();
                         int price =  pageCount * Config.getPagePrice();
-                        Payment payment = paymentService.createPayment(service.getUserById(Long.valueOf(chatID)).get() , price);
+                        Payment payment = paymentService.createPayment(service.getUserById(chatID).get() , price);
                         var message = InlineKeyboardBuilder.
                                 create(chatID).
                                 setText(String.format("Поверьте документ \"%s\" на предмет ошибок. '\n " +
