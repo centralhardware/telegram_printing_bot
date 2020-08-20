@@ -4,26 +4,21 @@ import java.util.ResourceBundle;
 
 public class Config {
 
-    private static final ResourceBundle resource    = ResourceBundle.getBundle("application");
-    private static final String username            = resource.getString("username");
-    private static final String token               = resource.getString("token");
-    private static final String cupsHost            = resource.getString("cupsHost");
-    private static final int    cupsPort            = Integer.parseInt(resource.getString("cupsPort"));
-    private static final int    pagePrice           = Integer.parseInt(resource.getString("pagePrice"));
-    private static final String sberbankUserName    = resource.getString("sberbankUserName");
-    private static final String sberbankPassword    = resource.getString("sberbankPassword");
-    private static final String baseUrl             = resource.getString("baseUrl");
+    private static final String username            = System.getenv("USERNAME");
+    private static final String token               = System.getenv("TOKEN");
+    private static final String cupsHost            = System.getenv("CUPS_HOST");
+    private static final int    cupsPort            = Integer.parseInt(System.getenv("CUPS_PORT"));
+    private static final int    pagePrice           = Integer.parseInt(System.getenv("PAGE_PRICE"));
+    private static final String sberbankUserName    = System.getenv("SBERBANK_USERNAME");
+    private static final String sberbankPassword    = System.getenv("SBERBANK_PASSWORD");
+    private static final String baseUrl             = System.getenv("BASE_URL");
     private static final String sberbankFailUrl     = baseUrl + "/fail";
     private static final String sberbankSuccessUrl  = baseUrl + "/success";
-    private static final boolean isEnableQr         = Boolean.parseBoolean(resource.getString("isEnableQr"));
-    private static final String companyName         = resource.getString("companyName");
-    private static final String companyLocation     = resource.getString("companyLocation");
-    private static final String embededMapIfram     = resource.getString("embeddedMap");
-    private static final String workingTime         = resource.getString("workingTime");
-
-    public static ResourceBundle getResource() {
-        return resource;
-    }
+    private static final boolean isEnableQr         = Boolean.parseBoolean(System.getenv("IS_ENBALE_QR"));
+    private static final String companyName         = System.getenv("COMPANY_NAME");
+    private static final String companyLocation     = System.getenv("COMPANY_LOCATION");
+    private static final String embededMapIfram     = System.getenv("EMBEDDED_MAP");
+    private static final String workingTime         = System.getenv("COMPANY_WORKING_TIME");
 
     public static String getUsername() {
         return username;

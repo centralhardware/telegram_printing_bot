@@ -7,6 +7,7 @@ import com.sun.star.uno.Exception;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.config.Task;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -39,6 +40,8 @@ import javax.validation.constraints.NotNull;
 import java.io.*;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class TelegramBot extends TelegramLongPollingCommandBot {
 
@@ -93,37 +96,45 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
         }
     }
 
+    private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
+
     private void processDocument(Document document, Long chatID, String username){
         try{
             SendChatAction sendChatAction = new SendChatAction().setChatId(chatID).setAction(ActionType.UPLOADDOCUMENT);
             execute(sendChatAction);
             if (document.getMimeType().equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")){
-                try {
-                    java.io.File result = null;
-                    try {
-                        result = DocxToPdf.convert(download(document.getFileId()));
-                    } catch (Exception | BootstrapException e) {
-                        e.printStackTrace();
+                Runnable task = new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            java.io.File result = null;
+                            try {
+                                result = DocxToPdf.convert(download(document.getFileId()));
+                            } catch (Exception | BootstrapException e) {
+                                e.printStackTrace();
+                            }
+                            SendDocument sendDocument = new SendDocument().
+                                    setChatId(chatID).
+                                    setDocument(String.format("%s.pdf", document.getFileName()), new FileInputStream(result));
+                            String printJobIdentifier = String.valueOf(chatID);
+                            PdfReader pdfReader = new PdfReader(result.getAbsolutePath());
+                            int price = pdfReader.getNumberOfPages() * Config.getPagePrice();
+                            var message = InlineKeyboardBuilder.
+                                    create(chatID).
+                                    setText(String.format("Поверьте документ на предмет ошибок. '\n " +
+                                            "Стоимость заказа: %s \n  " +
+                                            "Оплатить", price)).
+                                    row().button("да", printJobIdentifier).endRow().
+                                    row().button("нет", "нет").endRow();
+                            printQue.addToQue(printJobIdentifier ,new PrintDetail(result, document.getFileName(), price));
+                            execute(sendDocument);
+                            execute(message.build());
+                        } catch (IOException | TelegramApiException e) {
+                            e.printStackTrace();
+                        }
                     }
-                    SendDocument sendDocument = new SendDocument().
-                            setChatId(chatID).
-                            setDocument(String.format("%s.pdf", document.getFileName()), new FileInputStream(result));
-                    String printJobIdentifier = String.valueOf(chatID);
-                    PdfReader pdfReader = new PdfReader(result.getAbsolutePath());
-                    int price = pdfReader.getNumberOfPages() * Config.getPagePrice();
-                    var message = InlineKeyboardBuilder.
-                            create(chatID).
-                            setText(String.format("Поверьте документ на предмет ошибок. '\n " +
-                                    "Стоимость заказа: %s \n  " +
-                                    "Оплатить", price)).
-                            row().button("да", printJobIdentifier).endRow().
-                            row().button("нет", "нет").endRow();
-                    printQue.addToQue(printJobIdentifier ,new PrintDetail(result, document.getFileName(), price));
-                    execute(sendDocument);
-                    execute(message.build());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                };
+                executor.execute(task);
             } else if (document.getMimeType().equals("application/pdf")){
                 sendChatAction = new SendChatAction().setChatId(chatID).setAction(ActionType.TYPING);
                 execute(sendChatAction);
