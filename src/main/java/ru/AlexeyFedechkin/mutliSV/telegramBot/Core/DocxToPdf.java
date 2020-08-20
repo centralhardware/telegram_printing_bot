@@ -12,11 +12,15 @@ import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 import lombok.extern.slf4j.Slf4j;
 import ooo.connector.BootstrapSocketConnector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
 @Slf4j
 public class DocxToPdf {
+
+    private static final Logger log = LoggerFactory.getLogger(DocxToPdf.class);
 
     public static File convert(InputStream stream) throws Exception, BootstrapException, IOException {
         XComponentContext xContext = BootstrapSocketConnector.bootstrap("/usr/bin/soffice");
@@ -54,6 +58,7 @@ public class DocxToPdf {
         result.deleteOnExit();
         xStorable.storeToURL(String.format("file:///%s", result.getAbsolutePath()), propertyValues);
 
+        log.info(String.format("converted docx to pdf"));
         return result;
     }
 }

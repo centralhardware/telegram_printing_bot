@@ -1,23 +1,29 @@
 package ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
 
 import javax.persistence.*;
 import java.util.Date;
 
+/**
+ * bank transaction presentation
+ */
 @Entity
 @Table
 @Builder
 @NoArgsConstructor
 public class Payment {
 
-    private static final Logger log = LoggerFactory.getLogger(Cups.class);
+    private static final Logger log = LoggerFactory.getLogger(Payment.class);
 
+    /**
+     * ID unique in the store system
+     */
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
@@ -26,6 +32,9 @@ public class Payment {
     )
     @Column(updatable = false, nullable = false)
     private String uuid;
+    /**
+     * ID unique in the bank system
+     */
     private String orderId;
     @Column(nullable = false)
     private Integer amount;
@@ -57,20 +66,8 @@ public class Payment {
         return uuid;
     }
 
-    public String getOrderId() {
-        return orderId;
-    }
-
     public Integer getAmount() {
         return amount;
-    }
-
-    public Boolean getSuccessfully() {
-        return isSuccessfully;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
     }
 
     public TelegramUser getCreatedBy() {

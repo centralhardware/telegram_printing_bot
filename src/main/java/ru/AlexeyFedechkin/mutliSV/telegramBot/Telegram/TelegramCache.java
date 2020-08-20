@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Scope(scopeName = "singleton")
 public class TelegramCache {
 
-    private static final Logger log = LoggerFactory.getLogger(Cups.class);
+    private static final Logger log = LoggerFactory.getLogger(TelegramCache.class);
 
     private final Map<Integer, String> cache = new ConcurrentHashMap<>();
 

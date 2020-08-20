@@ -17,15 +17,20 @@ public class PrintQue {
         que.put(id, printDetail);
     }
 
-    public PrintDetail getPrintDetail(String id){
+    /**
+     * get detail needed for printing
+     * @param id user id
+     * @return printDetail
+     */
+    public PrintDetail getPrintDetail(@NonNull String id){
         return que.get(id);
     }
 
-    public boolean isFileInQue(String id){
+    public boolean isFileInQue(@NonNull String id){
         return que.containsKey(id);
     }
 
-    public void removeFromQue(String id){
+    public void removeFromQue(@NonNull String id){
         que.remove(id);
     }
 

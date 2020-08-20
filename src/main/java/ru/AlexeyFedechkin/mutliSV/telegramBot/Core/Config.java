@@ -1,7 +1,5 @@
 package ru.AlexeyFedechkin.mutliSV.telegramBot.Core;
 
-import java.util.ResourceBundle;
-
 public class Config {
 
     private static final String username            = System.getenv("USERNAME");
@@ -46,10 +44,6 @@ public class Config {
 
     public static String getSberbankPassword() {
         return sberbankPassword;
-    }
-
-    public static String getBaseUrl() {
-        return baseUrl;
     }
 
     public static String getSberbankFailUrl() {

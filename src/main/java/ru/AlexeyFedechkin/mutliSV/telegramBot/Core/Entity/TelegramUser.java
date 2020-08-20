@@ -50,20 +50,8 @@ public class TelegramUser {
         return username;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getSecondName() {
-        return secondName;
-    }
-
     public String getToken() {
         return token;
-    }
-
-    public int getNumberOfPurchases() {
-        return numberOfPurchases;
     }
 
     public Set<Payment> getPayments() {

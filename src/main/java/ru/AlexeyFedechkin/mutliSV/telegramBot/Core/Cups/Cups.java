@@ -53,23 +53,31 @@ public class Cups {
         byte[] bytes = Files.readAllBytes(file.toPath());
         PrintJob printJob = new PrintJob.Builder(bytes).jobName(String.format("for user %s file %s", username, fileName)).build();
         var printRequestResult = cupsPrinter.print(printJob);
+        log.info(String.format("print document %s for user %s", fileName, username));
         return printRequestResult.isSuccessfulResult();
     }
 
+
+    private URL url;
     /**
      * check cups host availability
      * @return true if cups host is up
      */
     public boolean checkAlive(){
         try {
-            URL url = new URL(String.format("http://%s:" + Config.getCupsPort(), Config.getCupsHost()));
+            if (url == null){
+                url = new URL(String.format("http://%s:" + Config.getCupsPort(), Config.getCupsHost()));
+            }
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.connect();
-            if (connection.getResponseCode() == 200) return true;
+            if (connection.getResponseCode() == 200){
+                log.info("check cups server alive: cups server online");
+                return true;
+            }
         } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+            log.warn("failed to check cups server alive", e);
         }
+        log.info("check cups server alive: cups server offline");
         return false;
     }
 
