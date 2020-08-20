@@ -17,6 +17,10 @@ public class Config {
     private static final String companyLocation     = System.getenv("COMPANY_LOCATION");
     private static final String embededMapIfram     = System.getenv("EMBEDDED_MAP");
     private static final String workingTime         = System.getenv("COMPANY_WORKING_TIME");
+    private static final Integer vkGroupId          = Integer.valueOf(System.getenv("VK_GROUP_ID"));
+    private static final String vkGroupToken        = System.getenv("VK_GROUP_TOKEN");
+    private static final int serverId               = Integer.parseInt(System.getenv("SERVER_ID"));
+    private static final String confirmationCode    = System.getenv("CONFIRMATION_CODE");
 
     public static String getUsername() {
         return username;
@@ -72,5 +76,21 @@ public class Config {
 
     public static String getWorkingTime() {
         return workingTime;
+    }
+
+    public static Integer getVkGroupId() {
+        return vkGroupId;
+    }
+
+    public static String getVkGroupToken() {
+        return vkGroupToken;
+    }
+
+    public static int getServerId() {
+        return serverId;
+    }
+
+    public static String getConfirmationCode() {
+        return confirmationCode;
     }
 }

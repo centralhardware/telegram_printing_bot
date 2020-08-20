@@ -8,5 +8,6 @@ import java.util.Optional;
 public interface PaymentRepository extends CrudRepository<Payment, String> {
 
     Optional<Payment> findByOrderId(String orderId);
+    Optional<Payment> findByUuid(String uuid);
 
 }

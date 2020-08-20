@@ -113,17 +113,19 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                         SendDocument sendDocument = new SendDocument().
                                 setChatId(chatID).
                                 setDocument(String.format("%s.pdf", document.getFileName()), new FileInputStream(result));
-                        String printJobIdentifier = String.valueOf(chatID);
                         PdfReader pdfReader = new PdfReader(result.getAbsolutePath());
-                        int price = pdfReader.getNumberOfPages() * Config.getPagePrice();
+                        int pageCount = pdfReader.getNumberOfPages();
+                        int price =  pageCount * Config.getPagePrice();
+                        Payment payment = paymentService.createPayment(service.getUserById(Long.valueOf(chatID)).get() , price);
                         var message = InlineKeyboardBuilder.
                                 create(chatID).
-                                setText(String.format("Поверьте документ на предмет ошибок. '\n " +
+                                setText(String.format("Поверьте документ \"%s\" на предмет ошибок. '\n " +
+                                        pageCount + " л.\n" +
                                         "Стоимость заказа: %s \n  " +
-                                        "Оплатить", price)).
-                                row().button("да", printJobIdentifier).endRow().
+                                        "Оплатить", document.getFileName() ,price)).
+                                row().button("да", payment.getUuid()).endRow().
                                 row().button("нет", "нет").endRow();
-                        printQue.addToQue(printJobIdentifier ,new PrintDetail(result, document.getFileName(), price));
+                        printQue.addToQue(payment.getUuid() ,new PrintDetail(result, document.getFileName(), price));
                         execute(sendDocument);
                         execute(message.build());
                     } catch (IOException | TelegramApiException e) {
@@ -144,19 +146,21 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                     outStream.write(buffer, 0, bytesRead);
                 }
                 PdfReader pdfReader = new PdfReader(targetFile.getAbsolutePath());
-                int price = pdfReader.getNumberOfPages() * Config.getPagePrice();
-                printQue.addToQue(String.valueOf(chatID) ,new PrintDetail(targetFile, document.getFileName(), price));
+                int pageNumber = pdfReader.getNumberOfPages();
+                int price =pageNumber* Config.getPagePrice();
                 Payment payment = paymentService.createPayment(service.getUserById(chatID).get() , price);
                 PaymentDetail paymentDetail = Sberbank.requestPaymentDetail(payment);
                 payment.setOrderId(paymentDetail.getOrderId());
                 paymentService.save(payment);
+                printQue.addToQue(String.valueOf(payment.getUuid()) ,new PrintDetail(targetFile, document.getFileName(), price));
                 if (!cups.checkAlive()){
                     SendMessage sendMessage = new SendMessage().setChatId(chatID).setText("Приносим свои извенения, но мы не можем выполнить печать в данный момент");
                     execute(sendMessage);
                     return;
                 }
                 InlineKeyboardBuilder inlineKeyboardBuilder = InlineKeyboardBuilder.create().
-                        setText(String.format("Стоимость заказа: %s", price)).
+                        setText(String.format(pageNumber + " л.\n" +
+                                "Стоимость печати файла \"%s\" сотавляет: %s руб.", document.getFileName(), price)).
                         setChatId(chatID).
                         row().button("Оплатить", "sdf", paymentDetail.getFormUrl()).endRow();
                 execute(inlineKeyboardBuilder.build());
@@ -187,7 +191,7 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                         setChatId(callbackQuery.getMessage().getChatId()).
                         setMessageId(callbackQuery.getMessage().getMessageId());
                 execute(deleteMessage);
-                Payment payment = paymentService.createPayment(service.getUserById(Long.valueOf(callbackQuery.getFrom().getId())).get() , printQue.getPrintDetail(printId).getPrice());
+                Payment payment = paymentService.findByUuid(callbackQuery.getData()).get();
                 PaymentDetail paymentDetail = Sberbank.requestPaymentDetail(payment);
                 payment.setOrderId(paymentDetail.getOrderId());
                 paymentService.save(payment);
@@ -197,7 +201,7 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                     return;
                 }
                 InlineKeyboardBuilder inlineKeyboardBuilder = InlineKeyboardBuilder.create().
-                        setText("?").
+                        setText(printQue.getPrintDetail(callbackQuery.getData()).getOriginalFileName()).
                         setChatId(Long.valueOf(callbackQuery.getFrom().getId())).
                         row().button("Оплатить", "sdf", paymentDetail.getFormUrl()).endRow();
                 execute(inlineKeyboardBuilder.build());

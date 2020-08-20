@@ -28,6 +28,10 @@ public class PaymentService {
         return repository.findByOrderId(orderId);
     }
 
+    public Optional<Payment> findByUuid(String uuid){
+        return  repository.findByUuid(uuid);
+    }
+
     public void save(Payment payment){
         repository.save(payment);
     }
