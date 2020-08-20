@@ -58,7 +58,7 @@ public class DocxToPdf {
         result.deleteOnExit();
         xStorable.storeToURL(String.format("file:///%s", result.getAbsolutePath()), propertyValues);
 
-        log.info(String.format("converted docx to pdf"));
+        log.info("converted docx to pdf");
         return result;
     }
 }

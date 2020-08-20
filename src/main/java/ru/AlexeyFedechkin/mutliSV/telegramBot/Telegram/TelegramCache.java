@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
