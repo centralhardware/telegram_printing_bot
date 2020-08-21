@@ -1,4 +1,3 @@
-# our base build image
 FROM maven:3.6-jdk-14 as maven
 
 COPY ./pom.xml ./pom.xml
@@ -7,7 +6,6 @@ RUN mvn dependency:go-offline -B
 
 COPY ./src ./src
 
-# build for release
 RUN mvn package
 
 
@@ -15,7 +13,6 @@ FROM openjdk:14-alpine
 
 
 COPY --from=maven target/multiSVBot-1.0-SNAPSHOT.jar .
-COPY --from=maven target/lib /lib
 
 RUN set -xe \
     && apk add --no-cache --purge -uU \
@@ -33,4 +30,4 @@ RUN set -xe \
     && rm -rf /var/cache/apk/* /tmp/*
 
 
-CMD ["java", "-jar", "multiSVBot-1.0-SNAPSHOT.jar", "--classpath=/lib" ]
+CMD ["java", "-jar", "multiSVBot-1.0-SNAPSHOT.jar" ]
