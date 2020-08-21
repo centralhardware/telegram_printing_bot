@@ -12,6 +12,9 @@ import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.PrintDetail;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.PrintQue;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.Payment;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.TelegramUser;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.User;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.UserType;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Service.PaymentService;
 
 import java.util.Optional;
@@ -54,7 +57,7 @@ public class PaymentWeb {
             Payment payment = paymentOptional.get();
             payment.setIsSuccessfully(false);
             paymentService.save(payment);
-            printQue.removeFromQue(String.valueOf(payment.getCreatedByTelegram().getId()));
+            printQue.removeFromQue(String.valueOf(payment.getUuid()));
             return ResponseEntity.ok(FAIL_PAGE);
         } else {
             return ResponseEntity.ok(NO_TRANSACTION_PAGE);
@@ -74,9 +77,15 @@ public class PaymentWeb {
             Payment payment = paymentOptional.get();
             payment.setIsSuccessfully(true);
             paymentService.save(payment);
-            PrintDetail printDetail = printQue.getPrintDetail(String.valueOf(payment.getCreatedByTelegram().getId()));
+            PrintDetail printDetail = null;
+            if (payment.getUserType() == UserType.TELEGRAM){
+                printDetail = printQue.getPrintDetail(String.valueOf(payment.getUuid()));
+            }
             try {
                 boolean result = cups.print(printDetail.getFile(), payment.getCreatedByTelegram().getUsername(), printDetail.getOriginalFileName());
+                if (payment.getUserType() == UserType.TELEGRAM){
+                    printQue.removeFromQue(String.valueOf(payment.getUuid()));
+                }
                 if (!result){
                     log.warn("print is not be successful");
                     return ResponseEntity.ok(SUCCESS_PAGE_PRINT_FAIL);
