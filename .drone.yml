@@ -10,3 +10,7 @@ steps:
 - name: build
   commands:
   - sudo docker build -t printing-bot .
+  
+trigger:
+  branch:
+  - master
