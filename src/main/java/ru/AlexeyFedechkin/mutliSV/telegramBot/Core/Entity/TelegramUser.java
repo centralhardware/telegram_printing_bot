@@ -28,7 +28,7 @@ public class TelegramUser {
     @Column(length = 64)
     private String token = "";
     private int numberOfPurchases;
-    @OneToMany(mappedBy = "createdBy")
+    @OneToMany(mappedBy = "createdByTelegram")
     private Set<Payment> payments;
 
     public void incrementNumberOfPurchases(){

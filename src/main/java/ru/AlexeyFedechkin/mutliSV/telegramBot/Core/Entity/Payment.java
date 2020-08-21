@@ -1,5 +1,6 @@
 package ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -17,6 +18,7 @@ import java.util.Date;
 @Table
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class Payment {
 
     private static final Logger log = LoggerFactory.getLogger(Payment.class);
@@ -45,22 +47,33 @@ public class Payment {
     @Column(name = "create_date")
     private Date createDate;
     @ManyToOne
-    @JoinColumn(name = "createdBy_id",nullable = false)
-    private  TelegramUser createdBy;
+    @JoinColumn(name = "createdBy_id_telegram",nullable = false)
+    private  TelegramUser createdByTelegram;
+    @ManyToOne
+    @JoinColumn(name = "createdBy_id_vk",nullable = false)
+    private VkUser createdByVk;
+    @Enumerated(EnumType.STRING)
+    private UserType userType;
+
+    public User getCreatedBy(){
+        switch (userType){
+            case VK -> {
+                return (User) createdByVk;
+            }
+            case TELEGRAM -> {
+                return (User) createdByTelegram;
+            }
+            default -> {
+                return null;
+            }
+        }
+    }
 
     public void setIsSuccessfully(boolean isSuccessfully){
         log.info(String.format("set if success to %s for transaction %s",isSuccessfully, uuid ));
         this.isSuccessfully = isSuccessfully;
     }
 
-    public Payment(String uuid, String orderId, Integer amount, Boolean isSuccessfully, Date createDate, TelegramUser createdBy) {
-        this.uuid = uuid;
-        this.orderId = orderId;
-        this.amount = amount;
-        this.isSuccessfully = isSuccessfully;
-        this.createDate = createDate;
-        this.createdBy = createdBy;
-    }
 
     public String getUuid() {
         return uuid;
@@ -70,8 +83,8 @@ public class Payment {
         return amount;
     }
 
-    public TelegramUser getCreatedBy() {
-        return createdBy;
+    public TelegramUser getCreatedByTelegram() {
+        return createdByTelegram;
     }
 
     public void setOrderId(String orderId) {

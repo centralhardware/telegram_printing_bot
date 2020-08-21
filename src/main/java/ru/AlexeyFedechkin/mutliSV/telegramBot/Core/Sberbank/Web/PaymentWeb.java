@@ -54,7 +54,7 @@ public class PaymentWeb {
             Payment payment = paymentOptional.get();
             payment.setIsSuccessfully(false);
             paymentService.save(payment);
-            printQue.removeFromQue(String.valueOf(payment.getCreatedBy().getId()));
+            printQue.removeFromQue(String.valueOf(payment.getCreatedByTelegram().getId()));
             return ResponseEntity.ok(FAIL_PAGE);
         } else {
             return ResponseEntity.ok(NO_TRANSACTION_PAGE);
@@ -74,9 +74,9 @@ public class PaymentWeb {
             Payment payment = paymentOptional.get();
             payment.setIsSuccessfully(true);
             paymentService.save(payment);
-            PrintDetail printDetail = printQue.getPrintDetail(String.valueOf(payment.getCreatedBy().getId()));
+            PrintDetail printDetail = printQue.getPrintDetail(String.valueOf(payment.getCreatedByTelegram().getId()));
             try {
-                boolean result = cups.print(printDetail.getFile(), payment.getCreatedBy().getUsername(), printDetail.getOriginalFileName());
+                boolean result = cups.print(printDetail.getFile(), payment.getCreatedByTelegram().getUsername(), printDetail.getOriginalFileName());
                 if (!result){
                     log.warn("print is not be successful");
                     return ResponseEntity.ok(SUCCESS_PAGE_PRINT_FAIL);

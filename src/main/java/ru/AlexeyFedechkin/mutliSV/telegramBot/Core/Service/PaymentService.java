@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.Payment;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.TelegramUser;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.UserType;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Repository.PaymentRepository;
 
 import java.util.Optional;
@@ -20,7 +21,7 @@ public class PaymentService {
     private PaymentRepository repository;
 
     public Payment createPayment(TelegramUser user, int amount){
-        Payment payment = Payment.builder().amount(amount).createdBy(user).build();
+        Payment payment = Payment.builder().amount(amount).createdByTelegram(user).userType(UserType.TELEGRAM).build();
         return repository.save(payment);
     }
 

@@ -19,8 +19,7 @@ public class Config {
     private static final String workingTime         = System.getenv("COMPANY_WORKING_TIME");
     private static final Integer vkGroupId          = Integer.valueOf(System.getenv("VK_GROUP_ID"));
     private static final String vkGroupToken        = System.getenv("VK_GROUP_TOKEN");
-    private static final int serverId               = Integer.parseInt(System.getenv("SERVER_ID"));
-    private static final String confirmationCode    = System.getenv("CONFIRMATION_CODE");
+    private static final boolean isEnableVk         = Boolean.parseBoolean(System.getenv("IS_ENABLE_VK"));
 
     public static String getUsername() {
         return username;
@@ -86,11 +85,7 @@ public class Config {
         return vkGroupToken;
     }
 
-    public static int getServerId() {
-        return serverId;
-    }
-
-    public static String getConfirmationCode() {
-        return confirmationCode;
+    public static boolean isIsEnableVk() {
+        return isEnableVk;
     }
 }

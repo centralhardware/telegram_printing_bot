@@ -15,8 +15,8 @@ public class VkBot {
     private static final Logger log = LoggerFactory.getLogger(VkBot.class);
 
     public static void initVkBot() throws Exception {
-        new VkBot();
         log.info("register vk bot");
+        new VkBot();
     }
 
     public VkBot() throws Exception {
@@ -24,7 +24,7 @@ public class VkBot {
         VkApiClient vkApiClient = new VkApiClient(transportClient);
         GroupActor groupActor = new GroupActor(Config.getVkGroupId(), Config.getVkGroupToken());
         try {
-            vkApiClient.groups().setLongPollSettings(groupActor, Config.getVkGroupId()).messageNew(true).enabled(true).execute();
+            vkApiClient.groups().setLongPollSettings(groupActor, Config.getVkGroupId()).messageNew(true).apiVersion("5.5").enabled(true).execute();
         } catch (ApiException e) {
             throw new RuntimeException("Api error during init", e);
         } catch (ClientException e) {

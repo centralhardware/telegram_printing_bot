@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Config;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.TelegramBot;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Vk.VkBot;
 
@@ -19,7 +20,9 @@ public class Main {
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Main.class, args);
         TelegramBot.initTelegramBot();
-        VkBot.initVkBot();
+        if (Config.isIsEnableVk()){
+            VkBot.initVkBot();
+        }
     }
 
 }
