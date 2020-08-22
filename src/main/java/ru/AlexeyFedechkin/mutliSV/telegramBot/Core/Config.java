@@ -20,6 +20,10 @@ public class Config {
     private static final Integer vkGroupId          = Integer.valueOf(System.getenv("VK_GROUP_ID"));
     private static final String vkGroupToken        = System.getenv("VK_GROUP_TOKEN");
     private static final boolean isEnableVk         = Boolean.parseBoolean(System.getenv("IS_ENABLE_VK"));
+    private static final String pop3Host            = System.getenv("POP3_HOST");
+    private static final String pop3User            = System.getenv("POP3_USER");
+    private static final String pop3Password        = System.getenv("POP3_PASSWORD");
+    private static final boolean isEmailEnabled     = Boolean.parseBoolean(System.getenv("IS_EMAIL_ENABLED"));
 
     public static String getUsername() {
         return username;
@@ -87,5 +91,21 @@ public class Config {
 
     public static boolean isIsEnableVk() {
         return isEnableVk;
+    }
+
+    public static String getPop3Host() {
+        return pop3Host;
+    }
+
+    public static String getPop3User() {
+        return pop3User;
+    }
+
+    public static String getPop3Password() {
+        return pop3Password;
+    }
+
+    public static boolean getIsEmailEnabled() {
+        return isEmailEnabled;
     }
 }

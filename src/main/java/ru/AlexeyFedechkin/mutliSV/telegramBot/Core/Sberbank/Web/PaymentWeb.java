@@ -12,8 +12,6 @@ import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.PrintDetail;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.PrintQue;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.Payment;
-import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.TelegramUser;
-import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.User;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.UserType;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Service.PaymentService;
 
