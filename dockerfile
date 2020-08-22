@@ -31,3 +31,5 @@ RUN set -xe \
 
 
 CMD ["java", "-jar", "multiSVBot-1.0-SNAPSHOT.jar" ]
+
+
