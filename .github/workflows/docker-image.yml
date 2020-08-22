@@ -7,12 +7,12 @@ jobs:
     runs-on: self-hosted
     steps:
     - name: cd to directory
-      run: cd /home/alex-server/multiSVBot & echo $PRINT_BOT_VERSION
+      run: cd /home/alex-server/multiSVBot 
     - name: update directory
       run: git pull
     - name: Build the Docker image
-      run: docker build -t "registry.chardware.duckdns.org/printing-bot:$PRINT_BOT_VERSION" /home/alex-server/multiSVBot
+      run: docker build -tag registry.chardware.duckdns.org/printing-bot:$PRINT_BOT_VERSION /home/alex-server/multiSVBot
     - name: push to registry
-      run:  docker push "registry.chardware.duckdns.org/printing-bot:$PRINT_BOT_VERSION"
+      run:  docker push registry.chardware.duckdns.org/printing-bot:$PRINT_BOT_VERSION
     - name: update version
       run: export PRINT_BOT_VERSION=$(($PRINT_BOT_VERSION+1))
