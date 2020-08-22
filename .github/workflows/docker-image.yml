@@ -12,6 +12,8 @@ jobs:
 
     steps:
     - name: Build the Docker image
-      run: sudo docker build . --file Dockerfile --tag registry.chardware.duckdns.org/printing-bot:$GITHUB_RUN_NUMBER
+      run: sudo docker build . --file Dockerfile --tag registry.chardware.duckdns.org/printing-bot:$BUILD_NUMBER
     - name: push to registry
-      run:  sudo docker push registry.chardware.duckdns.org/printing-bot:$GITHUB_RUN_NUMBER
+      run:  sudo docker push registry.chardware.duckdns.org/printing-bot:$BUILD_NUMBER
+      env:
+        BUILD_NUMBER: $GITHUB_RUN_NUMBER
