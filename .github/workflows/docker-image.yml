@@ -11,7 +11,7 @@ jobs:
     - name: update directory
       run: git pull
     - name: Build the Docker image
-      run: docker build --tag registry.chardware.duckdns.org/printing-bot:$PRINT_BOT_VERSION /home/alex-server/multiSVBot
+      run: docker build --tag="registry.chardware.duckdns.org/printing-bot:$PRINT_BOT_VERSION" /home/alex-server/multiSVBot
     - name: push to registry
       run:  docker push registry.chardware.duckdns.org/printing-bot:$PRINT_BOT_VERSION
     - name: update version
