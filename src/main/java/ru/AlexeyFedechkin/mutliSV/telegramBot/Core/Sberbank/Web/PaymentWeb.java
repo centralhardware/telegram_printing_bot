@@ -14,6 +14,8 @@ import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.PrintQue;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.Payment;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.UserType;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Service.PaymentService;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Main;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.TelegramBot;
 
 import java.util.Optional;
 
@@ -29,6 +31,7 @@ public class PaymentWeb {
     private final PaymentService paymentService;
     private final Cups cups;
     private final PrintQue printQue;
+    private TelegramBot telegramBot;
 
     public PaymentWeb(PaymentService paymentService, Cups cups, PrintQue printQue) {
         this.paymentService = paymentService;
@@ -49,6 +52,9 @@ public class PaymentWeb {
      */
     @RequestMapping(value = "/fail", method = RequestMethod.GET)
     public ResponseEntity<?> fail(@RequestParam String orderId) {
+        if (telegramBot == null){
+            telegramBot = Main.getTelegramBot();
+        }
         log.info("fail page requesting");
         Optional<Payment> paymentOptional = paymentService.findByOrderId(orderId);
         if (paymentOptional.isPresent()){
@@ -56,6 +62,9 @@ public class PaymentWeb {
             payment.setIsSuccessfully(false);
             paymentService.save(payment);
             printQue.removeFromQue(String.valueOf(payment.getUuid()));
+            if (payment.getUserType() == UserType.TELEGRAM){
+                telegramBot.sendMessage("Оплата не удалась", payment.getCreatedByTelegram().getId());
+            }
             return ResponseEntity.ok(FAIL_PAGE);
         } else {
             return ResponseEntity.ok(NO_TRANSACTION_PAGE);
@@ -69,6 +78,9 @@ public class PaymentWeb {
      */
     @RequestMapping(value = "/success", method = RequestMethod.GET)
     public ResponseEntity<?> success(@RequestParam String orderId){
+        if (telegramBot == null){
+            telegramBot = Main.getTelegramBot();
+        }
         log.info("success page requesting");
         Optional<Payment> paymentOptional = paymentService.findByOrderId(orderId);
         if (paymentOptional.isPresent()){
@@ -86,11 +98,20 @@ public class PaymentWeb {
                 }
                 if (!result){
                     log.warn("print is not be successful");
+                    if (payment.getUserType() == UserType.TELEGRAM){
+                        telegramBot.sendMessage("Оплата произведена успешно, однако при печати документа произвошла ошибка", payment.getCreatedByTelegram().getId());
+                    }
                     return ResponseEntity.ok(SUCCESS_PAGE_PRINT_FAIL);
                 }
             } catch (Exception e) {
+                if (payment.getUserType() == UserType.TELEGRAM){
+                    telegramBot.sendMessage("Оплата произведена успешно, однако при печати документа произвошла ошибка", payment.getCreatedByTelegram().getId());
+                }
                 log.warn("unable to print document", e);
                 return ResponseEntity.ok(SUCCESS_PAGE_PRINT_FAIL);
+            }
+            if (payment.getUserType() == UserType.TELEGRAM){
+                telegramBot.sendMessage("Оплата произведена успешно.", payment.getCreatedByTelegram().getId());
             }
             return ResponseEntity.ok(SUCCESS_PAGE);
         } else {

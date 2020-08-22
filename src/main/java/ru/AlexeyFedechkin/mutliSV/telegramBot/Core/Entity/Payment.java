@@ -46,11 +46,11 @@ public class Payment {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_date")
     private Date createDate;
-    @ManyToOne(optional = true,  fetch = FetchType.LAZY)
-    @JoinColumn(name = "createdBy_id_telegram", nullable = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "createdBy_id_telegram")
     private  TelegramUser createdByTelegram;
-    @ManyToOne(optional = true,  fetch = FetchType.LAZY)
-    @JoinColumn(name = "createdBy_id_vk", nullable = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "createdBy_id_vk")
     private VkUser createdByVk;
     @Enumerated(EnumType.STRING)
     private UserType userType;

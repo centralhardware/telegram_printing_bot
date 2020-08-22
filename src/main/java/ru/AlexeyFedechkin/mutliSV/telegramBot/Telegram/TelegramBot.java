@@ -50,15 +50,18 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
         ApiContextInitializer.init();
     }
 
-    public static void initTelegramBot(){
+    public static TelegramBot initTelegramBot(){
+        TelegramBot telegramBot = null;
         try {
+            telegramBot = new TelegramBot();
             TelegramBotsApi botsApi = new TelegramBotsApi();
-            botsApi.registerBot(new TelegramBot());
+            botsApi.registerBot(telegramBot);
             log.info("register telegram bot");
         } catch (TelegramApiRequestException e) {
             log.error("failed to register bot", e);
             System.exit(100);
         }
+        return telegramBot;
     }
 
     public TelegramBot(){
@@ -291,6 +294,15 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
         return null;
     }
 
+    public void sendMessage(String text, Long chatId){
+        SendMessage sendMessage = new SendMessage().setChatId(chatId).setText(text);
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            log.warn("failed to send message", e);
+        }
+    }
+
     public String getBotUsername() {
         return Config.getUsername();
     }
@@ -298,4 +310,5 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
     public String getBotToken() {
         return Config.getToken();
     }
+
 }

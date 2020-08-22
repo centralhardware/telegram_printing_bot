@@ -18,9 +18,11 @@ import ru.AlexeyFedechkin.mutliSV.telegramBot.Vk.VkBot;
 @Configuration
 public class Main {
 
+    private static TelegramBot telegramBot;
+
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Main.class, args);
-        TelegramBot.initTelegramBot();
+        telegramBot = TelegramBot.initTelegramBot();
         if (Config.getIsEmailEnabled()){
             MailReceiver.initEmail();
         }
@@ -29,4 +31,7 @@ public class Main {
         }
     }
 
+    public static TelegramBot getTelegramBot() {
+        return telegramBot;
+    }
 }
