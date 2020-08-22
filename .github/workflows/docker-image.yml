@@ -12,9 +12,9 @@ jobs:
 
     steps:
     - name: Build the Docker image
-      run: docker build -t registry.chardware.duckdns.org/printing-bot:$(PRINT_BOT_VERSION=1) .
+      run: docker build -t registry.chardware.duckdns.org/printing-bot:$(echo PRINT_BOT_VERSION) .
     - name: push to registry
-      run:  docker push registry.chardware.duckdns.org/printing-bot:$(PRINT_BOT_VERSION=1)
+      run:  docker push registry.chardware.duckdns.org/printing-bot:$(echo PRINT_BOT_VERSION)
     - name: update version
       run: export PRINT_BOT_VERSION=$(($PRINT_BOT_VERSION+1))
 
