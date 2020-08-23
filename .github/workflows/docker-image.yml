@@ -16,4 +16,4 @@ jobs:
     runs-on: self-hosted
     steps:
     - name: push to registry
-      run:  docker push registry.chardware.duckdns.org/printing-bot:$(cat /home/alex-server/m
+      run:  docker push registry.chardware.duckdns.org/printing-bot:$(cat /home/alex-server/multiSVBot/version)
