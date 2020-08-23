@@ -10,8 +10,6 @@ jobs:
       run: cd /home/alex-server/multiSVBot 
     - name: update directory
       run: git pull
-    - name: try package
-      run: mvn clean package
     - name: Build the Docker image
       run: docker build -t registry.chardware.duckdns.org/printing-bot:$(cat /home/alex-server/multiSVBot/version) /home/alex-server/multiSVBot
   push:
