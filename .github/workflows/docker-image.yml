@@ -13,7 +13,7 @@ jobs:
     - name: Build the Docker image
       run: docker build -t registry.chardware.duckdns.org/printing-bot:$(cat /home/alex-server/multiSVBot/version) /home/alex-server/multiSVBot
   push:
-    runs_on: self-hosted
+    runs-on: self-hosted
     steps:
     - name: push to registry
       run:  docker push registry.chardware.duckdns.org/printing-bot:$(cat /home/alex-server/m
