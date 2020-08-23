@@ -6,7 +6,6 @@
 
     <groupId>AlexeyFedechkin</groupId>
     <artifactId>multiSVBot</artifactId>
-    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -156,20 +155,6 @@
                     <mainClass>ru.AlexeyFedechkin.mutliSV.telegramBot.Main</mainClass>
                     <layout>ZIP</layout>
                 </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
