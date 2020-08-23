@@ -14,6 +14,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.QR;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.Mapper;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.TelegramCache;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Service.UserService;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.SpringContext;
@@ -39,6 +40,7 @@ public class DiscountCardCommand extends BotCommand {
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
         log.info(String.format("execute command %s for user %s", DiscountCardCommand.class.toString(), user.getUserName()));
+        service.create(Mapper.toInnerUser(user));
         try {
             SendChatAction sendChatAction = new SendChatAction().setChatId(chat.getId()).setAction(ActionType.UPLOADPHOTO);
             absSender.execute(sendChatAction);

@@ -85,6 +85,7 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
     @Override
     public void processNonCommandUpdate(Update update) {
         if (update.hasMessage()){
+            service.create(Mapper.toInnerUser(update.getMessage().getFrom()));
             var message = update.getMessage();
             if (message.hasPhoto() && Config.isIsEnableQr()){
                 processIncomingQR(update);
@@ -92,6 +93,7 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                 processDocument(message.getDocument(), update.getMessage().getChatId(), update.getMessage().getFrom().getUserName());
             }
         } else if (update.hasCallbackQuery()){
+            service.create(Mapper.toInnerUser(update.getCallbackQuery().getFrom()));
             if (update.hasCallbackQuery()) {
                 processCallback(update.getCallbackQuery());
             }
@@ -300,6 +302,15 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
             execute(sendMessage);
         } catch (TelegramApiException e) {
             log.warn("failed to send message", e);
+        }
+    }
+
+    public void  sendMessage(String text, Long chatId, java.io.File file, String fileName){
+        try {
+            SendDocument sendPhoto = new SendDocument().setChatId(chatId).setCaption(text).setDocument(fileName,new FileInputStream(file.getAbsolutePath()));
+            execute(sendPhoto);
+        } catch (TelegramApiException | FileNotFoundException e) {
+            e.printStackTrace();
         }
     }
 

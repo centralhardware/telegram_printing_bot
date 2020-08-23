@@ -17,6 +17,9 @@ import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Service.PaymentService;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Main;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.TelegramBot;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -77,7 +80,7 @@ public class PaymentWeb {
      * @return
      */
     @RequestMapping(value = "/success", method = RequestMethod.GET)
-    public ResponseEntity<?> success(@RequestParam String orderId){
+    public ResponseEntity<?> success(@RequestParam String orderId) throws IOException {
         if (telegramBot == null){
             telegramBot = Main.getTelegramBot();
         }
@@ -100,6 +103,21 @@ public class PaymentWeb {
                     log.warn("print is not be successful");
                     if (payment.getUserType() == UserType.TELEGRAM){
                         telegramBot.sendMessage("Оплата произведена успешно, однако при печати документа произвошла ошибка", payment.getCreatedByTelegram().getId());
+                        telegramBot.sendMessage("Время " + new SimpleDateFormat("H:m").format(payment.getCreateDate()) + "\n" +
+                                        "количество страниц - " + printDetail.getPrice() / Config.getPagePrice() + "\n" +
+                                        "Пользователь: " + "\n" +
+                                        "username: " +  payment.getCreatedByTelegram().getUsername() + "\n" +
+                                        "first name " + payment.getCreatedByTelegram().getFirstName() + "\n" +
+                                        "last name:  " + payment.getCreatedByTelegram().getSecondName() + "\n" +
+                                        "Оплата: \n" +
+                                        "UUID: " + payment.getUuid() + "\n" +
+                                        "orderId: " + payment.getOrderId() + "\n" +
+                                        "сумма платежа: " + payment.getAmount() + "\n" +
+                                        "дата создания: " + new SimpleDateFormat("yyyy LLLL d E.- H:m", new Locale("ru")).format(payment.getCreateDate()) + "\n" +
+                                        "статус печати: ошибка печати",
+                                Config.getTelegramGroupId(),
+                                printDetail.getFile(),
+                                printDetail.getOriginalFileName());
                     }
                     return ResponseEntity.ok(SUCCESS_PAGE_PRINT_FAIL);
                 }
@@ -107,11 +125,41 @@ public class PaymentWeb {
                 if (payment.getUserType() == UserType.TELEGRAM){
                     telegramBot.sendMessage("Оплата произведена успешно, однако при печати документа произвошла ошибка", payment.getCreatedByTelegram().getId());
                 }
+                telegramBot.sendMessage("Время " + new SimpleDateFormat("H:m").format(payment.getCreateDate()) + "\n" +
+                                "количество страниц - " + printDetail.getPrice() / Config.getPagePrice() + "\n" +
+                                "Пользователь: " + "\n" +
+                                "username: " +  payment.getCreatedByTelegram().getUsername() + "\n" +
+                                "first name " + payment.getCreatedByTelegram().getFirstName() + "\n" +
+                                "last name:  " + payment.getCreatedByTelegram().getSecondName() + "\n" +
+                                "Оплата: \n" +
+                                "UUID: " + payment.getUuid() + "\n" +
+                                "orderId: " + payment.getOrderId() + "\n" +
+                                "сумма платежа: " + payment.getAmount() + "\n" +
+                                "дата создания: " + new SimpleDateFormat("yyyy LLLL d E.- H:m", new Locale("ru")).format(payment.getCreateDate()) + "\n" +
+                                "статус печати: ошибка печати",
+                        Config.getTelegramGroupId(),
+                        printDetail.getFile(),
+                        printDetail.getOriginalFileName());
                 log.warn("unable to print document", e);
                 return ResponseEntity.ok(SUCCESS_PAGE_PRINT_FAIL);
             }
             if (payment.getUserType() == UserType.TELEGRAM){
                 telegramBot.sendMessage("Оплата произведена успешно.", payment.getCreatedByTelegram().getId());
+                telegramBot.sendMessage("Время " + new SimpleDateFormat("H:m").format(payment.getCreateDate()) + "\n" +
+                                "количество страниц - " + printDetail.getPrice() / Config.getPagePrice() + "\n" +
+                                "Пользователь: " + "\n" +
+                                "username: " +  payment.getCreatedByTelegram().getUsername() + "\n" +
+                                "first name " + payment.getCreatedByTelegram().getFirstName() + "\n" +
+                                "last name:  " + payment.getCreatedByTelegram().getSecondName() + "\n" +
+                                "Оплата: \n" +
+                                "UUID: " + payment.getUuid() + "\n" +
+                                "orderId: " + payment.getOrderId() + "\n" +
+                                "сумма платежа: " + payment.getAmount() + "\n" +
+                                "дата создания: " + new SimpleDateFormat("yyyy LLLL d E.- H:m", new Locale("ru")).format(payment.getCreateDate()) + "\n" +
+                                "статус печати: успешно",
+                        Config.getTelegramGroupId(),
+                        printDetail.getFile(),
+                        printDetail.getOriginalFileName());
             }
             return ResponseEntity.ok(SUCCESS_PAGE);
         } else {

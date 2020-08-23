@@ -80,4 +80,12 @@ public class Payment {
     public UserType getUserType() {
         return userType;
     }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
 }

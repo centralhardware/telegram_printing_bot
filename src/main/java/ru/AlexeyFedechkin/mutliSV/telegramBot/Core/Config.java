@@ -24,6 +24,7 @@ public class Config {
     private static final String pop3User            = System.getenv("POP3_USER");
     private static final String pop3Password        = System.getenv("POP3_PASSWORD");
     private static final boolean isEmailEnabled     = Boolean.parseBoolean(System.getenv("IS_EMAIL_ENABLED"));
+    private static final Long telegramGroupId       = Long.valueOf(System.getenv("TELEGRAM_GROUP_ID"));
 
     public static String getUsername() {
         return username;
@@ -107,5 +108,9 @@ public class Config {
 
     public static boolean getIsEmailEnabled() {
         return isEmailEnabled;
+    }
+
+    public static Long getTelegramGroupId() {
+        return telegramGroupId;
     }
 }
