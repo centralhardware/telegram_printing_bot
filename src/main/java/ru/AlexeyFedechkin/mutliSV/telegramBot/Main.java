@@ -23,11 +23,11 @@ public class Main {
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Main.class, args);
         telegramBot = TelegramBot.initTelegramBot();
-        if (Config.getIsEmailEnabled()){
-            MailReceiver.initEmail();
-        }
         if (Config.isIsEnableVk()){
             VkBot.initVkBot();
+        }
+        if (Config.getIsEmailEnabled()){
+            MailReceiver.initEmail();
         }
     }
 

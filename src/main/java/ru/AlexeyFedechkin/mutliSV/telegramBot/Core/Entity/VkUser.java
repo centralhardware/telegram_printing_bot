@@ -11,9 +11,24 @@ import java.util.Set;
 public class VkUser {
 
     @Id
-    private Long id;
+    private Integer id;
 
     @OneToMany(mappedBy = "createdByVk")
     private Set<Payment> payments;
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Set<Payment> getPayments() {
+        return payments;
+    }
+
+    public void setPayments(Set<Payment> payments) {
+        this.payments = payments;
+    }
 }

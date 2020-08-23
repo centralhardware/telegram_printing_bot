@@ -24,8 +24,7 @@ public class StartCommand extends BotCommand {
         super("start","show start message");
     }
 
-    //TODO add format
-    private static final String HELLO_MESSAGE = "Привет %s Добро пожаловать в бот " + Config.getCompanyName() +   "\n" +
+    public static final String HELLO_MESSAGE = "Привет %s Добро пожаловать в бот " + Config.getCompanyName() +   "\n" +
             " просто отправте боту файл в формате docx или pdf и можете забрать готовую распечатку в "+ Config.getCompanyLocation() + "\n" +
             "Мы работаем: " + Config.getWorkingTime();
 
