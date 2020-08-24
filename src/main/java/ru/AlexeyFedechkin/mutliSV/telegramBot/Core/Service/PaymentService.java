@@ -3,7 +3,6 @@ package ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.Payment;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.TelegramUser;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.UserType;
@@ -14,7 +13,7 @@ import java.util.Optional;
 @Component
 public class PaymentService {
 
-    private static final Logger log = LoggerFactory.getLogger(Cups.class);
+    private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
 
     private final PaymentRepository repository;
 

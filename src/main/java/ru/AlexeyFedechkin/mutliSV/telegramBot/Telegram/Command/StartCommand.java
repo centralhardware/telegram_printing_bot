@@ -11,14 +11,13 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Config;
-import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Service.UserService;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.SpringContext;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.Mapper;
 
 public class StartCommand extends BotCommand {
 
-    private static final Logger log = LoggerFactory.getLogger(Cups.class);
+    private static final Logger log = LoggerFactory.getLogger(StartCommand.class);
 
     public StartCommand(){
         super("start","show start message");
@@ -41,7 +40,7 @@ public class StartCommand extends BotCommand {
                     setText(String.format(HELLO_MESSAGE, user.getUserName()));
             absSender.execute(sendMessage);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            log.warn("failed to send message", e);
         }
     }
 }

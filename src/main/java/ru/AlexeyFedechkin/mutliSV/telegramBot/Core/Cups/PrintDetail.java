@@ -10,8 +10,17 @@ public class PrintDetail {
         this.price = price;
     }
 
+    /**
+     * amount in roubles
+     */
     private final int price;
+    /**
+     * temp file to ping
+     */
     private final File file;
+    /**
+     * the name of the file that was originally sent to from the messenger
+     */
     private final String originalFileName;
 
     public int getPrice() {

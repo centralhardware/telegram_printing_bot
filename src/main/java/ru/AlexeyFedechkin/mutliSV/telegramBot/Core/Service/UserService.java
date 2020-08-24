@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity.TelegramUser;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Random;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Repository.UserRepository;
@@ -16,7 +15,7 @@ import java.util.Optional;
 @Component
 public class UserService {
 
-    private static final Logger log = LoggerFactory.getLogger(Cups.class);
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private UserRepository userRepository;

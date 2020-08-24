@@ -36,7 +36,12 @@ import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.Command.DiscountCardComma
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.Command.StartCommand;
 
 import javax.validation.constraints.NotNull;
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -106,14 +111,14 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
         try{
             SendChatAction sendChatAction = new SendChatAction().setChatId(chatID).setAction(ActionType.UPLOADDOCUMENT);
             execute(sendChatAction);
-            if (document.getMimeType().equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")){
+            if (document.getMimeType().equals(MimeType.DOCX)){
                 Runnable task = () -> {
                     try {
                         java.io.File result = null;
                         try {
                             result = DocxToPdf.convert(download(document.getFileId()));
                         } catch (Exception | BootstrapException e) {
-                            e.printStackTrace();
+                            log.warn("failed to convert docx to pdf", e);
                         }
                         SendDocument sendDocument = new SendDocument().
                                 setChatId(chatID).
@@ -123,7 +128,8 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                         int price =  pageCount * Config.getPagePrice();
                         Payment payment = paymentService.createPayment(service.getUserById(chatID).get() , price);
                         var message = InlineKeyboardBuilder.
-                                create(chatID).
+                                create().
+                                setChatId(chatID).
                                 setText(String.format("Поверьте документ \"%s\" на предмет ошибок. '\n " +
                                         pageCount + " л.\n" +
                                         "Стоимость заказа: %s \n  " +
@@ -134,11 +140,11 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                         execute(sendDocument);
                         execute(message.build());
                     } catch (IOException | TelegramApiException e) {
-                        e.printStackTrace();
+                        log.warn("", e);
                     }
                 };
                 executor.execute(task);
-            } else if (document.getMimeType().equals("application/pdf")){
+            } else if (document.getMimeType().equals(MimeType.PDF)){
                 sendChatAction = new SendChatAction().setChatId(chatID).setAction(ActionType.TYPING);
                 execute(sendChatAction);
                 InputStream inputStream = download(document.getFileId());
@@ -171,7 +177,7 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                 execute(inlineKeyboardBuilder.build());
             }
         } catch (java.lang.Exception e) {
-            e.printStackTrace();
+            log.warn("", e);
         }
     }
 
@@ -191,7 +197,6 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
                 return;
             }
             if (printQue.isFileInQue(callbackQuery.getData())){
-                var printId = callbackQuery.getData();
                 DeleteMessage deleteMessage = new DeleteMessage().
                         setChatId(callbackQuery.getMessage().getChatId()).
                         setMessageId(callbackQuery.getMessage().getMessageId());
@@ -229,7 +234,7 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
         } catch (TelegramApiException e) {
             log.warn("failed to send message", e);
         } catch (java.lang.Exception e) {
-            e.printStackTrace();
+            log.warn("", e);
         }
     }
 
@@ -255,7 +260,8 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
             var optionalUser = service.getUserByToken(token);
             if (optionalUser.isPresent()){
                 sendMessage = InlineKeyboardBuilder.
-                        create(update.getMessage().getChatId()).
+                        create().
+                        setChatId(update.getMessage().getChatId()).
                         setText(optionalUser.get().toString()).
                         row().button("отметить покупку", token).endRow().
                         build();
@@ -296,6 +302,11 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
         return null;
     }
 
+    /**
+     * send message
+     * @param text text
+     * @param chatId chatId
+     */
     public void sendMessage(String text, Long chatId){
         SendMessage sendMessage = new SendMessage().setChatId(chatId).setText(text);
         try {
@@ -305,21 +316,28 @@ public class TelegramBot extends TelegramLongPollingCommandBot {
         }
     }
 
+    /**
+     * send photo
+     * @param text caption
+     * @param chatId chatId
+     * @param file document
+     * @param fileName name of document
+     */
     public void  sendMessage(String text, Long chatId, java.io.File file, String fileName){
         try {
             SendDocument sendPhoto = new SendDocument().setChatId(chatId).setCaption(text).setDocument(fileName,new FileInputStream(file.getAbsolutePath()));
             execute(sendPhoto);
         } catch (TelegramApiException | FileNotFoundException e) {
-            e.printStackTrace();
+            log.warn("failed to send message", e);
         }
     }
 
     public String getBotUsername() {
-        return Config.getUsername();
+        return Config.getTelegramUsername();
     }
 
     public String getBotToken() {
-        return Config.getToken();
+        return Config.getTelegramToken();
     }
 
 }

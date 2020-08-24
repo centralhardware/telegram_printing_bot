@@ -9,12 +9,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Config;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.NetUtil;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.file.Files;
 
 @Component
@@ -58,27 +56,12 @@ public class Cups {
     }
 
 
-    private URL url;
     /**
      * check cups host availability
      * @return true if cups host is up
      */
-    public boolean checkAlive(){
-        try {
-            if (url == null){
-                url = new URL(String.format("http://%s:" + Config.getCupsPort(), Config.getCupsHost()));
-            }
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.connect();
-            if (connection.getResponseCode() == 200){
-                log.info("check cups server alive: cups server online");
-                return true;
-            }
-        } catch (IOException e) {
-            log.warn("failed to check cups server alive", e);
-        }
-        log.info("check cups server alive: cups server offline");
-        return false;
+    public boolean checkAlive() {
+        return NetUtil.ping("http://" + Config.getCupsHost() + ":" + Config.getCupsPort());
     }
 
 }

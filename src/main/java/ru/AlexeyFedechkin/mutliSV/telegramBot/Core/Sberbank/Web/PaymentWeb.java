@@ -17,7 +17,6 @@ import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Service.PaymentService;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Main;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.TelegramBot;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Optional;
@@ -80,7 +79,7 @@ public class PaymentWeb {
      * @return
      */
     @RequestMapping(value = "/success", method = RequestMethod.GET)
-    public ResponseEntity<?> success(@RequestParam String orderId) throws IOException {
+    public ResponseEntity<?> success(@RequestParam String orderId) {
         if (telegramBot == null){
             telegramBot = Main.getTelegramBot();
         }
@@ -103,18 +102,7 @@ public class PaymentWeb {
                     log.warn("print is not be successful");
                     if (payment.getUserType() == UserType.TELEGRAM){
                         telegramBot.sendMessage("Оплата произведена успешно, однако при печати документа произвошла ошибка", payment.getCreatedByTelegram().getId());
-                        telegramBot.sendMessage("Время " + new SimpleDateFormat("H:m").format(payment.getCreateDate()) + "\n" +
-                                        "количество страниц - " + printDetail.getPrice() / Config.getPagePrice() + "\n" +
-                                        "Пользователь: " + "\n" +
-                                        "username: " +  payment.getCreatedByTelegram().getUsername() + "\n" +
-                                        "first name " + payment.getCreatedByTelegram().getFirstName() + "\n" +
-                                        "last name:  " + payment.getCreatedByTelegram().getSecondName() + "\n" +
-                                        "Оплата: \n" +
-                                        "UUID: " + payment.getUuid() + "\n" +
-                                        "orderId: " + payment.getOrderId() + "\n" +
-                                        "сумма платежа: " + payment.getAmount() + "\n" +
-                                        "дата создания: " + new SimpleDateFormat("yyyy LLLL d E.- H:m", new Locale("ru")).format(payment.getCreateDate()) + "\n" +
-                                        "статус печати: ошибка печати",
+                        telegramBot.sendMessage(genInfoMessage("ошибка печати", printDetail, payment),
                                 Config.getTelegramGroupId(),
                                 printDetail.getFile(),
                                 printDetail.getOriginalFileName());
@@ -125,18 +113,7 @@ public class PaymentWeb {
                 if (payment.getUserType() == UserType.TELEGRAM){
                     telegramBot.sendMessage("Оплата произведена успешно, однако при печати документа произвошла ошибка", payment.getCreatedByTelegram().getId());
                 }
-                telegramBot.sendMessage("Время " + new SimpleDateFormat("H:m").format(payment.getCreateDate()) + "\n" +
-                                "количество страниц - " + printDetail.getPrice() / Config.getPagePrice() + "\n" +
-                                "Пользователь: " + "\n" +
-                                "username: " +  payment.getCreatedByTelegram().getUsername() + "\n" +
-                                "first name " + payment.getCreatedByTelegram().getFirstName() + "\n" +
-                                "last name:  " + payment.getCreatedByTelegram().getSecondName() + "\n" +
-                                "Оплата: \n" +
-                                "UUID: " + payment.getUuid() + "\n" +
-                                "orderId: " + payment.getOrderId() + "\n" +
-                                "сумма платежа: " + payment.getAmount() + "\n" +
-                                "дата создания: " + new SimpleDateFormat("yyyy LLLL d E.- H:m", new Locale("ru")).format(payment.getCreateDate()) + "\n" +
-                                "статус печати: ошибка печати",
+                telegramBot.sendMessage(genInfoMessage("ошибка печати", printDetail, payment),
                         Config.getTelegramGroupId(),
                         printDetail.getFile(),
                         printDetail.getOriginalFileName());
@@ -145,18 +122,7 @@ public class PaymentWeb {
             }
             if (payment.getUserType() == UserType.TELEGRAM){
                 telegramBot.sendMessage("Оплата произведена успешно.", payment.getCreatedByTelegram().getId());
-                telegramBot.sendMessage("Время " + new SimpleDateFormat("H:m").format(payment.getCreateDate()) + "\n" +
-                                "количество страниц - " + printDetail.getPrice() / Config.getPagePrice() + "\n" +
-                                "Пользователь: " + "\n" +
-                                "username: " +  payment.getCreatedByTelegram().getUsername() + "\n" +
-                                "first name " + payment.getCreatedByTelegram().getFirstName() + "\n" +
-                                "last name:  " + payment.getCreatedByTelegram().getSecondName() + "\n" +
-                                "Оплата: \n" +
-                                "UUID: " + payment.getUuid() + "\n" +
-                                "orderId: " + payment.getOrderId() + "\n" +
-                                "сумма платежа: " + payment.getAmount() + "\n" +
-                                "дата создания: " + new SimpleDateFormat("yyyy LLLL d E.- H:m", new Locale("ru")).format(payment.getCreateDate()) + "\n" +
-                                "статус печати: успешно",
+                telegramBot.sendMessage(genInfoMessage("успешно", printDetail, payment),
                         Config.getTelegramGroupId(),
                         printDetail.getFile(),
                         printDetail.getOriginalFileName());
@@ -167,6 +133,21 @@ public class PaymentWeb {
         }
     }
 
+    private static String genInfoMessage(String status, PrintDetail printDetail, Payment payment){
+        return "Время " + new SimpleDateFormat("H:m").format(payment.getCreateDate()) + "\n" +
+                "количество страниц - " + printDetail.getPrice() / Config.getPagePrice() + "\n" +
+                "Пользователь: " + "\n" +
+                "username: " +  payment.getCreatedByTelegram().getUsername() + "\n" +
+                "first name " + payment.getCreatedByTelegram().getFirstName() + "\n" +
+                "last name:  " + payment.getCreatedByTelegram().getSecondName() + "\n" +
+                "Оплата: \n" +
+                "UUID: " + payment.getUuid() + "\n" +
+                "orderId: " + payment.getOrderId() + "\n" +
+                "сумма платежа: " + payment.getAmount() + "\n" +
+                "дата создания: " + new SimpleDateFormat("yyyy LLLL d E.- H:m", new Locale("ru")).format(payment.getCreateDate()) + "\n" +
+                "статус печати: " + status;
+    }
+
     private static final String NO_TRANSACTION_PAGE =
             "<center><h1>Транзакции с таким номером не существует</h1>" +
                     "<h2>Если вы нашли баг пожайлуста сообщите нам на printomat@centralhardware.ru</h2></center>" +
@@ -175,7 +156,7 @@ public class PaymentWeb {
     private static final String FAIL_PAGE =
             "<center><H1>Произошла ошибка</H1>" +
             "<h3>Удостоверьтесь, что у вас достаточно средств на карте и повторите процесс</h3>" +
-            "</center>" ;
+            "</center>";
 
     private static final String SUCCESS_PAGE_PRINT_FAIL =
             "<center> <H1>Оплата прошла успешно. Однако печать не удалась</H1> " +

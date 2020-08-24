@@ -12,12 +12,11 @@ import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.QR;
-import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.Mapper;
-import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.TelegramCache;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Service.UserService;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.SpringContext;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.Mapper;
+import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.TelegramCache;
 
 import java.util.Comparator;
 
@@ -26,7 +25,7 @@ import java.util.Comparator;
  */
 public class DiscountCardCommand extends BotCommand {
 
-    private static final Logger log = LoggerFactory.getLogger(Cups.class);
+    private static final Logger log = LoggerFactory.getLogger(DiscountCardCommand.class);
 
     public DiscountCardCommand() {
         super("discount_card", "get discount qr");
@@ -54,7 +53,7 @@ public class DiscountCardCommand extends BotCommand {
                 sendAndStoreCache(sendPhoto,user,absSender);
             }
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            log.warn("unable to send message", e);
         }
     }
 
@@ -66,7 +65,7 @@ public class DiscountCardCommand extends BotCommand {
                     .orElse(null).getFileId();
             telegramCache.store(user.getId(), fileId);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            log.warn("unable to send message with cache", e);
         }
     }
 }

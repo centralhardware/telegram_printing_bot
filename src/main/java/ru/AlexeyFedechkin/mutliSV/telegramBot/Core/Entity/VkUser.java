@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -25,10 +26,6 @@ public class VkUser {
     }
 
     public Set<Payment> getPayments() {
-        return payments;
-    }
-
-    public void setPayments(Set<Payment> payments) {
-        this.payments = payments;
+        return new HashSet<>(payments);
     }
 }

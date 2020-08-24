@@ -7,7 +7,6 @@ import lombok.NonNull;
 import net.glxn.qrgen.javase.QRCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -18,7 +17,7 @@ import java.io.InputStream;
 
 public class QR {
 
-    private static final Logger log = LoggerFactory.getLogger(Cups.class);
+    private static final Logger log = LoggerFactory.getLogger(QR.class);
 
     public static InputStream generateQRCodeImage(@NonNull String barcodeText) {
         log.info(String.format("generate QR code from String: %s", barcodeText));

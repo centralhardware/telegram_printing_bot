@@ -1,11 +1,18 @@
 package ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -18,8 +25,11 @@ import java.util.Set;
 @NoArgsConstructor
 public class TelegramUser {
 
-    private static final Logger log = LoggerFactory.getLogger(Cups.class);
+    private static final Logger log = LoggerFactory.getLogger(TelegramUser.class);
 
+    /**
+     * chat id
+     */
     @Id
     private Long id;
     private String username;
@@ -33,7 +43,7 @@ public class TelegramUser {
 
     public void incrementNumberOfPurchases(){
        log.info(String.format("increment numberOfPurchases for user %s", username));
-        numberOfPurchases++;
+       numberOfPurchases++;
     }
 
     @Override
@@ -46,6 +56,10 @@ public class TelegramUser {
     }
 
 
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -55,11 +69,7 @@ public class TelegramUser {
     }
 
     public Set<Payment> getPayments() {
-        return payments;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
+        return new HashSet<>(payments);
     }
 
     public Long getId() {

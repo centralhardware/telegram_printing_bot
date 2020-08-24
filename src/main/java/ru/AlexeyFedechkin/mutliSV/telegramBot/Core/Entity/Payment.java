@@ -8,7 +8,18 @@ import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.util.Date;
 
 /**
@@ -38,6 +49,9 @@ public class Payment {
      * ID unique in the bank system
      */
     private String orderId;
+    /**
+     * amount in roubles
+     */
     @Column(nullable = false)
     private Integer amount;
     @Column
@@ -46,20 +60,32 @@ public class Payment {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_date")
     private Date createDate;
+    /**
+     * if receive from telegram
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "createdBy_id_telegram")
     private  TelegramUser createdByTelegram;
+    /**
+     * if receive from vk
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "createdBy_id_vk")
     private VkUser createdByVk;
+    /**
+     * which messenger the file was sent from
+     */
     @Enumerated(EnumType.STRING)
     private UserType userType;
 
     public void setIsSuccessfully(boolean isSuccessfully){
-        log.info(String.format("set if success to %s for transaction %s",isSuccessfully, uuid ));
+        log.info(String.format("set if success to %s for transaction %s", isSuccessfully, uuid ));
         this.isSuccessfully = isSuccessfully;
     }
 
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
 
     public String getUuid() {
         return uuid;
@@ -73,10 +99,6 @@ public class Payment {
         return createdByTelegram;
     }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
-
     public UserType getUserType() {
         return userType;
     }
@@ -86,6 +108,6 @@ public class Payment {
     }
 
     public Date getCreateDate() {
-        return createDate;
+        return new Date(createDate.getTime());
     }
 }

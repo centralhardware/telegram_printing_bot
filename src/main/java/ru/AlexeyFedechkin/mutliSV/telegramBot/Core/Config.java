@@ -2,8 +2,8 @@ package ru.AlexeyFedechkin.mutliSV.telegramBot.Core;
 
 public class Config {
 
-    private static final String username            = System.getenv("USERNAME");
-    private static final String token               = System.getenv("TOKEN");
+    private static final String telegramUsername    = System.getenv("TELEGRAM_USERNAME");
+    private static final String telegramToken       = System.getenv("TELEGRAM_TOKEN");
     private static final String cupsHost            = System.getenv("CUPS_HOST");
     private static final int    cupsPort            = Integer.parseInt(System.getenv("CUPS_PORT"));
     private static final int    pagePrice           = Integer.parseInt(System.getenv("PAGE_PRICE"));
@@ -26,12 +26,12 @@ public class Config {
     private static final boolean isEmailEnabled     = Boolean.parseBoolean(System.getenv("IS_EMAIL_ENABLED"));
     private static final Long telegramGroupId       = Long.valueOf(System.getenv("TELEGRAM_GROUP_ID"));
 
-    public static String getUsername() {
-        return username;
+    public static String getTelegramUsername() {
+        return telegramUsername;
     }
 
-    public static String getToken() {
-        return token;
+    public static String getTelegramToken() {
+        return telegramToken;
     }
 
     public static String getCupsHost() {

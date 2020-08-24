@@ -3,9 +3,6 @@ package ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Email;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.mail.Folder;
-import javax.mail.Session;
-import javax.mail.Store;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -13,11 +10,6 @@ public class MailReceiver extends TimerTask {
 
     private static final long DElAY = 1000L;
     private static final Logger log = LoggerFactory.getLogger(MailReceiver.class);
-    private String protocol = "imaps";
-    private String file = "INBOX";
-    private Session session;
-    private Store store;
-    private Folder folder;
 
     public static void initEmail() throws Exception {
         Timer timer = new Timer("emailReceiver");

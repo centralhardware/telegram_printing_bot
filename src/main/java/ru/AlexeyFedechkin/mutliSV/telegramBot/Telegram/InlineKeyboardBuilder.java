@@ -22,12 +22,6 @@ public class InlineKeyboardBuilder {
         return new InlineKeyboardBuilder();
     }
 
-    public static InlineKeyboardBuilder create(@NonNull Long chatId) {
-        InlineKeyboardBuilder builder = new InlineKeyboardBuilder();
-        builder.setChatId(chatId);
-        return builder;
-    }
-
     public InlineKeyboardBuilder setText(@NonNull String text) {
         this.text = text;
         return this;
@@ -58,7 +52,6 @@ public class InlineKeyboardBuilder {
         this.row = null;
         return this;
     }
-
 
     public SendMessage build() {
         SendMessage message = new SendMessage();
