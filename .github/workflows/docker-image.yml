@@ -14,3 +14,4 @@ jobs:
       run: docker build -t registry.chardware.duckdns.org/printing-bot:$(cat /home/alex-server/multiSVBot/version) /home/alex-server/multiSVBot
     - name: push to registry
       run:  docker push registry.chardware.duckdns.org/printing-bot:$(cat /home/alex-server/multiSVBot/version)
+      
