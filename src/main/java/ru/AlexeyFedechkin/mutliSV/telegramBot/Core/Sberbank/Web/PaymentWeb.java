@@ -18,8 +18,7 @@ import ru.AlexeyFedechkin.mutliSV.telegramBot.Main;
 import ru.AlexeyFedechkin.mutliSV.telegramBot.Telegram.TelegramBot;
 
 import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * endpoint necessary to work with the payment system
@@ -34,6 +33,7 @@ public class PaymentWeb {
     private final Cups cups;
     private final PrintQue printQue;
     private TelegramBot telegramBot;
+    private final List<String> alreadySend = new ArrayList<>();
 
     public PaymentWeb(PaymentService paymentService, Cups cups, PrintQue printQue) {
         this.paymentService = paymentService;
@@ -101,17 +101,23 @@ public class PaymentWeb {
                 if (!result){
                     log.warn("print is not be successful");
                     if (payment.getUserType() == UserType.TELEGRAM){
-                        telegramBot.sendMessage("Оплата произведена успешно, однако при печати документа произвошла ошибка", payment.getCreatedByTelegram().getId());
-                        telegramBot.sendMessage(genInfoMessage("ошибка печати", printDetail, payment),
-                                Config.getTelegramGroupId(),
-                                printDetail.getFile(),
-                                printDetail.getOriginalFileName());
+                        if (!alreadySend.contains(payment.getUuid())){
+                            telegramBot.sendMessage("Оплата произведена успешно, однако при печати документа произвошла ошибка", payment.getCreatedByTelegram().getId());
+                            telegramBot.sendMessage(genInfoMessage("ошибка печати", printDetail, payment),
+                                    Config.getTelegramGroupId(),
+                                    printDetail.getFile(),
+                                    printDetail.getOriginalFileName());
+                            alreadySend.add(payment.getUuid());
+                        }
                     }
                     return ResponseEntity.ok(SUCCESS_PAGE_PRINT_FAIL);
                 }
             } catch (Exception e) {
                 if (payment.getUserType() == UserType.TELEGRAM){
-                    telegramBot.sendMessage("Оплата произведена успешно, однако при печати документа произвошла ошибка", payment.getCreatedByTelegram().getId());
+                    if (!alreadySend.contains(payment.getUuid())){
+                        telegramBot.sendMessage("Оплата произведена успешно, однако при печати документа произвошла ошибка", payment.getCreatedByTelegram().getId());
+                        alreadySend.add(payment.getUuid());
+                    }
                 }
                 telegramBot.sendMessage(genInfoMessage("ошибка печати", printDetail, payment),
                         Config.getTelegramGroupId(),
@@ -121,11 +127,14 @@ public class PaymentWeb {
                 return ResponseEntity.ok(SUCCESS_PAGE_PRINT_FAIL);
             }
             if (payment.getUserType() == UserType.TELEGRAM){
-                telegramBot.sendMessage("Оплата произведена успешно.", payment.getCreatedByTelegram().getId());
-                telegramBot.sendMessage(genInfoMessage("успешно", printDetail, payment),
-                        Config.getTelegramGroupId(),
-                        printDetail.getFile(),
-                        printDetail.getOriginalFileName());
+                if (!alreadySend.contains(payment.getUuid())){
+                    telegramBot.sendMessage("Оплата произведена успешно.", payment.getCreatedByTelegram().getId());
+                    telegramBot.sendMessage(genInfoMessage("успешно", printDetail, payment),
+                            Config.getTelegramGroupId(),
+                            printDetail.getFile(),
+                            printDetail.getOriginalFileName());
+                    alreadySend.add(payment.getUuid());
+                }
             }
             return ResponseEntity.ok(SUCCESS_PAGE);
         } else {

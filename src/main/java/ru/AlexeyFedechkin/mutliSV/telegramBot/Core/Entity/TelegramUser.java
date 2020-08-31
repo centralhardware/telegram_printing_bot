@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.AlexeyFedechkin.mutliSV.telegramBot.Core.Cups.Cups;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
