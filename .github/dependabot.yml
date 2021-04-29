@@ -1,0 +1,40 @@
+version: 2
+updates:
+- package-ecosystem: maven
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "22:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: org.springframework.boot:spring-boot-maven-plugin
+    versions:
+    - 2.4.2
+    - 2.4.3
+    - 2.4.4
+  - dependency-name: org.springframework.boot:spring-boot-starter-data-jpa
+    versions:
+    - 2.4.2
+    - 2.4.3
+    - 2.4.4
+  - dependency-name: org.springframework.boot:spring-boot-starter-web
+    versions:
+    - 2.4.2
+    - 2.4.3
+    - 2.4.4
+  - dependency-name: org.telegram:telegrambotsextensions
+    versions:
+    - 5.0.1.1
+    - 5.1.0
+    - 5.1.1
+  - dependency-name: org.telegram:telegrambots
+    versions:
+    - 5.0.1.1
+    - 5.1.0
+    - 5.1.1
+  - dependency-name: org.postgresql:postgresql
+    versions:
+    - 42.2.19
+  - dependency-name: org.projectlombok:lombok
+    versions:
+    - 1.18.18
